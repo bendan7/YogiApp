@@ -11,11 +11,11 @@ import UpdateProfile from "../pages/UpdateProfile";
 
 export default function App() {
   return (
-    <Container
-      className="d-flex align-items-center justify-content-center w-100"
+    <div
+      className="d-flex align-items-center justify-content-center w-100 p-3"
       style={{ minHeight: "100vh" }}
     >
-      <div className="w-100" style={{ maxWidth: "400px" }}>
+      <div className="w-100" style={{ maxWidth: "800px" }}>
         <Router>
           <AuthProvider>
             <Switch>
@@ -28,6 +28,6 @@ export default function App() {
           </AuthProvider>
         </Router>
       </div>
-    </Container>
+    </div>
   );
 }
