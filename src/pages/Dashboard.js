@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Card, Button, Alert } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import UpcomingMeetings from "../components/UpcomingMeetings";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Dashboard() {
   const [error, setError] = useState("");
@@ -17,6 +18,7 @@ export default function Dashboard() {
       console.log(ex);
     }
   }
+
   return (
     <>
       <Card className="text-center mb-4">
@@ -34,6 +36,7 @@ export default function Dashboard() {
       <Card className="text-center mb-4">
         <Card.Body>
           <h2>רישום לשיעורים</h2>
+          <UpcomingMeetings />
         </Card.Body>
       </Card>
       <Card className="text-center mb-4">

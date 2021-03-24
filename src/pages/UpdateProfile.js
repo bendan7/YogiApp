@@ -1,7 +1,7 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
-import { useAuth } from "../../contexts/AuthContext";
-import { Link, useHistory } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function UpdateProfile() {
   const emailRef = useRef();
@@ -13,7 +13,6 @@ export default function UpdateProfile() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
   const [msg, setMsg] = useState();
-  const history = useHistory();
 
   async function handleSubmit(e) {
     e.preventDefault();
