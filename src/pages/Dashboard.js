@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Button, Alert } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import UpcomingMeetings from "../components/UpcomingMeetings";
@@ -9,6 +9,13 @@ export default function Dashboard() {
   const { currentUser, logout } = useAuth();
   const history = useHistory();
   const cardStyle = { backgroundColor: "#f6f7fb" };
+
+  useEffect(() => {
+    if (currentUser.isAdmin) {
+      history.push("/admin");
+    }
+  });
+
   async function handleLogout() {
     try {
       await logout();
@@ -20,12 +27,11 @@ export default function Dashboard() {
   }
 
   const cardClassName = "text-center mb-4 shadow-sm";
-
   return (
     <>
       <Card className={cardClassName} style={cardStyle}>
         <Card.Body>
-          <div>{currentUser?.email}</div>
+          <h3>{currentUser?.displayName} שלום</h3>
           <Link to="update-profile">עדכן פרטים</Link>
           <Button onClick={handleLogout}>התנתק</Button>
         </Card.Body>

@@ -1,22 +1,17 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
 
 export default function Signup() {
   const emailRef = useRef();
+  const nameRef = useRef();
   const passwordRef = useRef();
   const passwordConfRef = useRef();
-  const { signup, currentUser } = useAuth();
+  const { signup } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
   const history = useHistory();
-
-  useEffect(() => {
-    if (currentUser) {
-      history.push("/");
-    }
-  });
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -25,15 +20,25 @@ export default function Signup() {
       return setError("הסיסמאות אינן תואומות");
     }
 
+    if (!nameRef.current.value) {
+      return setError("שם מלא לא חוקי");
+    }
+
     try {
       setError("");
       setLoading(true);
-      await signup(emailRef.current.value, passwordRef.current.value);
+      await signup(
+        emailRef.current.value,
+        passwordRef.current.value,
+        nameRef.current.value
+      );
     } catch (e) {
       setError(`${e?.message} `);
-    } finally {
       setLoading(false);
+      return;
     }
+
+    history.push("/");
   }
 
   return (
@@ -45,6 +50,10 @@ export default function Signup() {
             <Form.Group id="email">
               <Form.Label>דואר אלקטרוני</Form.Label>
               <Form.Control type="email" ref={emailRef} required />
+            </Form.Group>
+            <Form.Group id="name">
+              <Form.Label>שם מלא</Form.Label>
+              <Form.Control type="name" ref={nameRef} required />
             </Form.Group>
             <Form.Group id="password">
               <Form.Label>סיסמא</Form.Label>

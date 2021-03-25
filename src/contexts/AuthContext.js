@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { auth } from "../firebase";
+import { auth, firestore } from "../firebase";
 
 const AuthContext = React.createContext();
 
@@ -11,8 +11,13 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState();
   const [loading, setLoading] = useState(true);
 
-  function signup(email, password) {
-    return auth.createUserWithEmailAndPassword(email, password);
+  function signup(email, password, userName) {
+    return auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((userCardi) => {
+        const user = auth.currentUser;
+        user.updateProfile({ displayName: userName });
+      });
   }
 
   function login(email, password) {
@@ -31,12 +36,32 @@ export function AuthProvider({ children }) {
     return currentUser.updatePassword(password);
   }
 
+  async function IsUserAdmin(user) {
+    return firestore
+      .collection("admin")
+      .get()
+      .then((querySnapshot) => {
+        for (const doc of querySnapshot.docs) {
+          if (doc.data().uid === user.uid) {
+            return true;
+          }
+        }
+        return false;
+      })
+      .catch(() => false);
+  }
+
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user && (await IsUserAdmin(user))) {
+        user.isAdmin = true;
+      }
+
       setCurrentUser(user);
       setLoading(false);
-      return unsubscribe;
     });
+
+    return unsubscribe;
   }, []);
 
   const value = {
