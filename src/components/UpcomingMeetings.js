@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, ListGroup } from "react-bootstrap";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -8,9 +8,9 @@ export default function UpcomingMeetings() {
   const { currentUser } = useAuth();
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 
-  const availableMeetingStyle = { backgroundColor: "#c4def6" };
-  const unavailableMeetingStyle = { backgroundColor: "#FEF3BD" };
-  const RegisteredMeetingStyle = { backgroundColor: "#BDEEB8" };
+  const availableMeetingBackgroundColor = "#e4fafa";
+  const unavailableMeetingBackgroundColor = "#faf7e4";
+  const RegisteredMeetingBackgroundColor = "#e4fae7";
 
   useEffect(() => {
     var upcomingRef = db.ref("upcoming/");
@@ -36,23 +36,14 @@ export default function UpcomingMeetings() {
       .remove();
   }
 
-  const RegisterButton = ({ meeting, isActive }) =>
-    isActive ? (
-      <Button
-        size="sm"
-        variant="success"
-        onClick={() => RegisterToMeeting(meeting)}
-      >
-        הרשמה
-      </Button>
-    ) : null;
+  const RegisterButton = ({ meeting }) => (
+    <Button variant="success" onClick={() => RegisterToMeeting(meeting)}>
+      הרשמה
+    </Button>
+  );
 
   const UnregisterButton = ({ meeting }) => (
-    <Button
-      size="sm"
-      variant="danger"
-      onClick={() => UnregisterFromMeeting(meeting)}
-    >
+    <Button variant="danger" onClick={() => UnregisterFromMeeting(meeting)}>
       ביטול הרשמה
     </Button>
   );
@@ -72,7 +63,7 @@ export default function UpcomingMeetings() {
   };
 
   return (
-    <div>
+    <ListGroup>
       {upcomingMeetings.map((meeting) => {
         const UserRegistertionKey = GetRegisterUserKeyToMeeting(meeting);
         const numOfPar = meeting.participates
@@ -80,15 +71,21 @@ export default function UpcomingMeetings() {
           : 0;
 
         const availableSeats = meeting.max_parti - numOfPar;
+        let style = { borderRadius: "25px" };
+        let meetingButton = null;
+        let backgroundColor;
 
-        let style = {};
         if (UserRegistertionKey == null && availableSeats > 0) {
-          style = availableMeetingStyle;
+          backgroundColor = availableMeetingBackgroundColor;
+          meetingButton = <RegisterButton meeting={meeting} />;
         } else if (UserRegistertionKey != null) {
-          style = RegisteredMeetingStyle;
+          backgroundColor = RegisteredMeetingBackgroundColor;
+          meetingButton = <UnregisterButton meeting={meeting} />;
         } else {
-          style = unavailableMeetingStyle;
+          backgroundColor = unavailableMeetingBackgroundColor;
+          meetingButton = <h5>השיעור מלא</h5>;
         }
+        style["backgroundColor"] = backgroundColor;
 
         const date = new Date(meeting.datetime);
         const dateStr = `${date.getDate()}/${date.getMonth() + 1} יום ${
@@ -96,35 +93,40 @@ export default function UpcomingMeetings() {
         }`;
 
         return (
-          <div key={meeting.id} className="mt-2 p-1 border " style={style}>
+          <ListGroup.Item
+            key={meeting.id}
+            className="mt-2 p-1 border shadow-sm"
+            style={style}
+          >
             <div className="d-flex justify-content-around ">
               <div>
-                <div>
+                <h4 className="m-0">
                   {date.getUTCHours()}:{date.getUTCMinutes()}
-                </div>
-                <h6>{dateStr}</h6>
+                </h4>
+                <h5 className="m-0">{dateStr}</h5>
               </div>
-              <h4>
-                {meeting?.title} - {meeting?.loctaion}
-              </h4>
-            </div>
-            <div className="d-flex justify-content-around "></div>
 
-            <div className="d-flex justify-content-around ">
-              {UserRegistertionKey != null ? (
-                <UnregisterButton meeting={meeting} />
-              ) : (
-                <RegisterButton
-                  meeting={meeting}
-                  isActive={availableSeats > 0}
-                />
-              )}
-              <p className="align-self-end">מקומות פנוים: {availableSeats}</p>
+              <div className="text-right">
+                <h3 className="m-0">{meeting?.title}</h3>
+                <h5 className="m-0">מיקום:{meeting?.loctaion}</h5>
+              </div>
             </div>
-            {meeting.notes ? <div>{meeting.notes}*</div> : null}
-          </div>
+            <div className="mt-2 mb-0 ">
+              {meeting.notes ? (
+                <p style={{ direction: "rtl" }} className="text-right p-2 m-0">
+                  ** {meeting.notes}
+                </p>
+              ) : null}
+              <div>
+                {availableSeats > 0 || UserRegistertionKey ? (
+                  <small className="m-0">מקומות זמינים: {availableSeats}</small>
+                ) : null}
+                <div className="m-1">{meetingButton}</div>
+              </div>
+            </div>
+          </ListGroup.Item>
         );
       })}
-    </div>
+    </ListGroup>
   );
 }

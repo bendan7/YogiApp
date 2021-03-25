@@ -8,7 +8,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const { currentUser, logout } = useAuth();
   const history = useHistory();
-
+  const cardStyle = { backgroundColor: "#f6f7fb" };
   async function handleLogout() {
     try {
       await logout();
@@ -19,9 +19,11 @@ export default function Dashboard() {
     }
   }
 
+  const cardClassName = "text-center mb-4 shadow-sm";
+
   return (
     <>
-      <Card className="text-center mb-4">
+      <Card className={cardClassName} style={cardStyle}>
         <Card.Body>
           <div>{currentUser?.email}</div>
           <Link to="update-profile">עדכן פרטים</Link>
@@ -33,18 +35,18 @@ export default function Dashboard() {
           </Alert>
         )}
       </Card>
-      <Card className="text-center mb-4">
+      <Card className={cardClassName} style={cardStyle}>
         <Card.Body>
           <h2>רישום לשיעורים</h2>
           <UpcomingMeetings />
         </Card.Body>
       </Card>
-      <Card className="text-center mb-4">
+      <Card className={cardClassName} style={cardStyle}>
         <Card.Body>
           <h2>היסטורית שיעורים</h2>
         </Card.Body>
       </Card>
-      <Card className="text-center ">
+      <Card className={cardClassName} style={cardStyle}>
         <Card.Body>
           <h2>כרטיסיות</h2>
         </Card.Body>

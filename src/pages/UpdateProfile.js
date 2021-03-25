@@ -69,7 +69,7 @@ export default function UpdateProfile() {
             <Form.Group>
               <Form.Label> סיסמה נוכחית</Form.Label>
               <Form.Control
-                id="password"
+                id="old-password"
                 type="password"
                 ref={oldPassRef}
                 required
@@ -79,7 +79,7 @@ export default function UpdateProfile() {
             <Form.Group>
               <Form.Label> סיסמה חדשה</Form.Label>
               <Form.Control
-                id="password"
+                id="new-password"
                 type="password"
                 ref={passwordRef}
                 required
@@ -88,7 +88,7 @@ export default function UpdateProfile() {
             <Form.Group>
               <Form.Label>אימות סיסמה חדשה</Form.Label>
               <Form.Control
-                id="password"
+                id="new-password-conf"
                 type="password"
                 ref={passwordConfRef}
                 required
