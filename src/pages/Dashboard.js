@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Alert } from "react-bootstrap";
+import { Card, Button, Alert, Collapse } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import UpcomingMeetings from "../components/UpcomingMeetings";
 import { useAuth } from "../contexts/AuthContext";
+import UserCard from "../components/UserCard";
+import CollapseCard from "../components/CollapseCard";
 
 export default function Dashboard() {
-  const [error, setError] = useState("");
-  const { currentUser, logout } = useAuth();
+  const { currentUser } = useAuth();
   const history = useHistory();
-  const cardStyle = { backgroundColor: "#f6f7fb" };
 
   useEffect(() => {
     if (currentUser.isAdmin) {
@@ -16,47 +16,29 @@ export default function Dashboard() {
     }
   });
 
-  async function handleLogout() {
-    try {
-      await logout();
-      history.push("/login");
-    } catch (ex) {
-      setError("התנתקות נכשלה");
-      console.log(ex);
-    }
-  }
+  const cardStyle = { backgroundColor: "#f6f7fb" };
+  const cardClassName = "text-center mb-4 shadow-sm ";
 
-  const cardClassName = "text-center mb-4 shadow-sm";
   return (
     <>
-      <Card className={cardClassName} style={cardStyle}>
-        <Card.Body>
-          <h3>{currentUser?.displayName} שלום</h3>
-          <Link to="update-profile">עדכן פרטים</Link>
-          <Button onClick={handleLogout}>התנתק</Button>
-        </Card.Body>
-        {error && (
-          <Alert className=" mt-3 mb-0 text-center" variant="danger">
-            {error}
-          </Alert>
-        )}
-      </Card>
-      <Card className={cardClassName} style={cardStyle}>
-        <Card.Body>
-          <h2>רישום לשיעורים</h2>
-          <UpcomingMeetings />
-        </Card.Body>
-      </Card>
-      <Card className={cardClassName} style={cardStyle}>
-        <Card.Body>
-          <h2>היסטורית שיעורים</h2>
-        </Card.Body>
-      </Card>
-      <Card className={cardClassName} style={cardStyle}>
-        <Card.Body>
-          <h2>כרטיסיות</h2>
-        </Card.Body>
-      </Card>
+      <UserCard ClassName={cardClassName} Style={cardStyle} />
+      <CollapseCard
+        cardTitle="רישום לשיעורים"
+        className={cardClassName}
+        style={cardStyle}
+      >
+        <UpcomingMeetings />
+      </CollapseCard>
+      <CollapseCard
+        cardTitle="היסטורית שיעורים"
+        className={cardClassName}
+        style={cardStyle}
+      ></CollapseCard>
+      <CollapseCard
+        cardTitle="כרטיסיות"
+        className={cardClassName}
+        style={cardStyle}
+      ></CollapseCard>
     </>
   );
 }

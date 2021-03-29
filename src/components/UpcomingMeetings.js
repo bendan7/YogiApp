@@ -13,9 +13,13 @@ export default function UpcomingMeetings() {
   const RegisteredMeetingBackgroundColor = "#e4fae7";
 
   useEffect(() => {
+    let isMounted = true;
+
     var upcomingRef = db.ref("upcoming/");
     upcomingRef.on("value", (snapshot) => {
-      setUpcomingMeetings(Object.values(snapshot.val()));
+      if (isMounted) {
+        setUpcomingMeetings(Object.values(snapshot.val()));
+      }
     });
   }, []);
 
