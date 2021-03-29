@@ -14,7 +14,6 @@ export default function UpcomingMeetings() {
 
   useEffect(() => {
     let isMounted = true;
-
     var upcomingRef = db.ref("upcoming/");
     upcomingRef.on("value", (snapshot) => {
       if (isMounted) {
