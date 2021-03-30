@@ -5,16 +5,31 @@ import UpcomingMeetings from "../components/UpcomingMeetings";
 import { useAuth } from "../contexts/AuthContext";
 import UserCard from "../components/UserCard";
 import CollapseCard from "../components/CollapseCard";
+import MeetingHistory from "../components/MeetingHistory";
 
 export default function Dashboard() {
   const { currentUser } = useAuth();
   const history = useHistory();
 
-  useEffect(() => {
-    if (currentUser.isAdmin) {
-      history.push("/admin");
+  /* 
+  userHistory = [
+    {
+      type:meeting
+      date:1/2/21 20:30
+      title:yoga
+      location:gan-yanva
     }
-  });
+    {
+      type:newTickt
+      date:10/1/21
+      numOfEntry:10
+    }
+  ]
+
+  */
+  const [userHistory, setUserHistory] = useState();
+
+  useEffect(() => {});
 
   const cardStyle = { backgroundColor: "#f6f7fb" };
   const cardClassName = "text-center mb-4 shadow-sm ";
@@ -33,7 +48,9 @@ export default function Dashboard() {
         cardTitle="היסטורית שיעורים"
         className={cardClassName}
         style={cardStyle}
-      ></CollapseCard>
+      >
+        <MeetingHistory />
+      </CollapseCard>
       <CollapseCard
         cardTitle="כרטיסיות"
         className={cardClassName}

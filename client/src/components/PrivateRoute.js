@@ -9,11 +9,13 @@ export default function PrivateRoute({ component: Component, ...rest }) {
     <Route
       {...rest}
       render={(props) => {
-        return currentUser ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/login" />
-        );
+        if (currentUser && currentUser.isAdmin) {
+          return <Redirect to="/admin" />;
+        } else if (currentUser) {
+          return <Component {...props} />;
+        } else {
+          return <Redirect to="/login" />;
+        }
       }}
     ></Route>
   );

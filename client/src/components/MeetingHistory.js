@@ -8,9 +8,32 @@ export default function MeetingHistory() {
   const { currentUser } = useAuth();
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 
+  async function GetHistory() {
+    var accessToken = null;
+
+    await currentUser.getIdToken().then(function (token) {
+      accessToken = token;
+    });
+
+    const headers = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    fetch("/userhistory", headers).then((res) => {
+      res.text().then((data) => {
+        console.log(data);
+      });
+    });
+
+    //console.log(headers);
+  }
+
   useEffect(() => {
+    GetHistory();
+
     let isMounted = true;
-    // getuser history
   }, []);
 
   return (

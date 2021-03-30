@@ -9,11 +9,13 @@ export default function PrivateAdminRoute({ component: Component, ...rest }) {
     <Route
       {...rest}
       render={(props) => {
-        return currentUser && currentUser.isAdmin ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/" />
-        );
+        if (currentUser && currentUser.isAdmin) {
+          return <Component {...props} />;
+        } else if (currentUser) {
+          return <Redirect to="/" />;
+        } else {
+          return <Redirect to="/login" />;
+        }
       }}
     ></Route>
   );
