@@ -14,7 +14,7 @@ import AdminDashboard from "../pages/AdminDashboard";
 export default function App() {
   return (
     <div
-      className="d-flex align-items-center justify-content-center w-100 p-3"
+      className="d-flex align-items-top justify-content-center w-100 p-3"
       style={{ minHeight: "100vh" }}
     >
       <div className="w-100" style={{ maxWidth: "800px" }}>
