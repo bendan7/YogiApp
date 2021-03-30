@@ -2,15 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Button, ListGroup } from "react-bootstrap";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
+import Colors from "../constants/Colors";
 
 export default function UpcomingMeetings() {
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const { currentUser } = useAuth();
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 
-  const availableMeetingBackgroundColor = "#e4fafa";
-  const unavailableMeetingBackgroundColor = "#faf7e4";
-  const RegisteredMeetingBackgroundColor = "#e4fae7";
+  const availableMeetingBackgroundColor = Colors.blue;
+  const unavailableMeetingBackgroundColor = Colors.red;
+  const RegisteredMeetingBackgroundColor = Colors.green;
 
   useEffect(() => {
     let isMounted = true;

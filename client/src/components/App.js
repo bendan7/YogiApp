@@ -1,6 +1,6 @@
 import React from "react";
 import Signup from "../pages/Signup";
-import Dashboard from "../pages/Dashboard";
+import UserDashboard from "../pages/UserDashboard";
 import Login from "../pages/Login";
 import {} from "react-bootstrap";
 import { AuthProvider } from "../contexts/AuthContext";
@@ -21,7 +21,7 @@ export default function App() {
         <Router>
           <AuthProvider>
             <Switch>
-              <PrivateRoute exact path="/" component={Dashboard} />
+              <PrivateRoute exact path="/" component={UserDashboard} />
               <PrivateRoute path="/update-profile" component={UpdateProfile} />
               <PrivateAdminRoute path="/admin" component={AdminDashboard} />
               <Route path="/signup" component={Signup} />
