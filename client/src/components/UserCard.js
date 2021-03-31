@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { Card, Button, Alert } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useRegistration } from "../contexts/RegistrationContext";
 
 export default function UserCard({ ClassName, Style, ...props }) {
   const { currentUser, logout } = useAuth();
   const history = useHistory();
   const [error, setError] = useState("");
+  const { registered, userEntries } = useRegistration();
 
   async function handleLogout() {
     try {
@@ -27,7 +29,7 @@ export default function UserCard({ ClassName, Style, ...props }) {
           </div>
           <div>
             <h3>{currentUser?.displayName} שלום</h3>
-            <h3>מספר כניסות: {props.validEntries}</h3>
+            <h3>מספר כניסות: {userEntries - registered.length}</h3>
             <Link to="update-profile">עדכן פרטים</Link>
           </div>
         </div>

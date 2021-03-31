@@ -51,6 +51,24 @@ export function AuthProvider({ children }) {
       .catch(() => false);
   }
 
+  async function GetAuthHeader() {
+    if (currentUser == null) {
+      return;
+    }
+
+    var accessToken = null;
+    await currentUser.getIdToken().then(function (token) {
+      accessToken = token;
+    });
+
+    const headers = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+    return headers;
+  }
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user && (await IsUserAdmin(user))) {
@@ -71,11 +89,12 @@ export function AuthProvider({ children }) {
     signup,
     resetPassword,
     updateUserPassword,
+    GetAuthHeader,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {!loading ? children : null}
     </AuthContext.Provider>
   );
 }

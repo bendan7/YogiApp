@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button, ListGroup } from "react-bootstrap";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 import Colors from "../constants/Colors";
+import { useRegistration } from "../contexts/RegistrationContext";
 
 //This component is conncted to realtime db
 export default function UpcomingMeetings(props) {
-  const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const { currentUser } = useAuth();
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+
+  const { meetings, registered, userEntries } = useRegistration();
 
   function RegisterToMeeting(meeting) {
     db.ref("upcoming/")
@@ -51,23 +53,9 @@ export default function UpcomingMeetings(props) {
     </Button>
   );
 
-  const IsRegistered = (meeting) => {
-    if (meeting.participates == null) {
-      return false;
-    }
-
-    for (const [key, value] of Object.entries(meeting.participates)) {
-      if (value.uid === currentUser.uid) {
-        return true;
-      }
-    }
-
-    return false;
-  };
-
   return (
     <ListGroup>
-      {props.meetings.map((meeting) => {
+      {meetings.map((meeting) => {
         const numOfPar = meeting.participates
           ? Object.keys(meeting.participates).length
           : 0;
@@ -77,12 +65,16 @@ export default function UpcomingMeetings(props) {
         let meetingOptions = null;
         let backgroundColor;
 
-        const isUserReg = IsRegistered(meeting);
+        const isUserReg = registered.includes(meeting.id);
 
         if (!isUserReg && availableSeats > 0) {
           // meeting avalivble to regstration
           backgroundColor = Colors.blue;
-          meetingOptions = <RegisterButton meeting={meeting} />;
+
+          const isEntriesLeft = userEntries - registered.length;
+          if (isEntriesLeft > 0) {
+            meetingOptions = <RegisterButton meeting={meeting} />;
+          }
         } else if (isUserReg) {
           // user is regsterd to this meeting
           backgroundColor = Colors.green;

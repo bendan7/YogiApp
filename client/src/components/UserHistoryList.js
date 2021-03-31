@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ListGroup } from "react-bootstrap";
 import Colors from "../constants/Colors";
+import { useRegistration } from "../contexts/RegistrationContext";
 
 export default function UserHistoryList(props) {
+  const { userHistory } = useRegistration();
+
   function HistoryEntry(props) {
     const type = props.type === "meeting" ? "שיעור" : "כרטיסיה";
     const text =
@@ -31,9 +34,11 @@ export default function UserHistoryList(props) {
 
   return (
     <ListGroup className="p-0 m-0">
-      {props.entries?.map((entry, index) => (
-        <HistoryEntry key={index} {...entry} />
-      ))}
+      {userHistory?.map((entry, index) =>
+        index < props.maxInfoEntries ? (
+          <HistoryEntry key={index} {...entry} />
+        ) : null
+      )}
     </ListGroup>
   );
 }
