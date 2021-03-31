@@ -4,24 +4,11 @@ import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 import Colors from "../constants/Colors";
 
-export default function UpcomingMeetings() {
+//This component is conncted to realtime db
+export default function UpcomingMeetings(props) {
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const { currentUser } = useAuth();
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-
-  const availableMeetingBackgroundColor = Colors.blue;
-  const unavailableMeetingBackgroundColor = Colors.red;
-  const RegisteredMeetingBackgroundColor = Colors.green;
-
-  useEffect(() => {
-    let isMounted = true;
-    var upcomingRef = db.ref("upcoming/");
-    upcomingRef.on("value", (snapshot) => {
-      if (isMounted) {
-        setUpcomingMeetings(Object.values(snapshot.val()));
-      }
-    });
-  }, []);
 
   function RegisterToMeeting(meeting) {
     db.ref("upcoming/")
@@ -31,13 +18,25 @@ export default function UpcomingMeetings() {
   }
 
   function UnregisterFromMeeting(meeting) {
-    const regKey = GetRegisterUserKeyToMeeting(meeting);
-    console.log(regKey);
-    db.ref("upcoming/")
-      .child(meeting.id)
-      .child("participates")
-      .child(regKey)
-      .remove();
+    let regKey;
+
+    if (meeting.participates == null) {
+      return null;
+    }
+
+    for (const [key, value] of Object.entries(meeting.participates)) {
+      if (value.uid === currentUser.uid) {
+        regKey = key;
+      }
+    }
+
+    if (regKey) {
+      db.ref("upcoming/")
+        .child(meeting.id)
+        .child("participates")
+        .child(regKey)
+        .remove();
+    }
   }
 
   const RegisterButton = ({ meeting }) => (
@@ -52,44 +51,49 @@ export default function UpcomingMeetings() {
     </Button>
   );
 
-  const GetRegisterUserKeyToMeeting = (meeting) => {
+  const IsRegistered = (meeting) => {
     if (meeting.participates == null) {
-      return null;
+      return false;
     }
 
     for (const [key, value] of Object.entries(meeting.participates)) {
       if (value.uid === currentUser.uid) {
-        return key;
+        return true;
       }
     }
 
-    return null;
+    return false;
   };
 
   return (
     <ListGroup>
-      {upcomingMeetings.map((meeting) => {
-        const UserRegistertionKey = GetRegisterUserKeyToMeeting(meeting);
+      {props.meetings.map((meeting) => {
         const numOfPar = meeting.participates
           ? Object.keys(meeting.participates).length
           : 0;
 
         const availableSeats = meeting.max_parti - numOfPar;
-        let style = { borderRadius: "25px" };
-        let meetingButton = null;
+
+        let meetingOptions = null;
         let backgroundColor;
 
-        if (UserRegistertionKey == null && availableSeats > 0) {
-          backgroundColor = availableMeetingBackgroundColor;
-          meetingButton = <RegisterButton meeting={meeting} />;
-        } else if (UserRegistertionKey != null) {
-          backgroundColor = RegisteredMeetingBackgroundColor;
-          meetingButton = <UnregisterButton meeting={meeting} />;
+        const isUserReg = IsRegistered(meeting);
+
+        if (!isUserReg && availableSeats > 0) {
+          // meeting avalivble to regstration
+          backgroundColor = Colors.blue;
+          meetingOptions = <RegisterButton meeting={meeting} />;
+        } else if (isUserReg) {
+          // user is regsterd to this meeting
+          backgroundColor = Colors.green;
+          meetingOptions = <UnregisterButton meeting={meeting} />;
         } else {
-          backgroundColor = unavailableMeetingBackgroundColor;
-          meetingButton = <h5>השיעור מלא</h5>;
+          // meeting is full
+          backgroundColor = Colors.red;
+          meetingOptions = <h5 className="font-weight-bold">השיעור מלא</h5>;
         }
-        style["backgroundColor"] = backgroundColor;
+
+        let style = { borderRadius: "25px", backgroundColor: backgroundColor };
 
         const date = new Date(meeting.datetime);
         const dateStr = `${date.getDate()}/${date.getMonth() + 1} יום ${
@@ -109,7 +113,6 @@ export default function UpcomingMeetings() {
                 </h4>
                 <h5 className="m-0">{dateStr}</h5>
               </div>
-
               <div className="text-right">
                 <h3 className="m-0">{meeting?.title}</h3>
                 <h5 className="m-0">מיקום:{meeting?.loctaion}</h5>
@@ -122,10 +125,10 @@ export default function UpcomingMeetings() {
                 </p>
               ) : null}
               <div>
-                {availableSeats > 0 || UserRegistertionKey ? (
+                {availableSeats > 0 || isUserReg ? (
                   <small className="m-0">מקומות זמינים: {availableSeats}</small>
                 ) : null}
-                <div className="m-1">{meetingButton}</div>
+                <div className="m-1">{meetingOptions}</div>
               </div>
             </div>
           </ListGroup.Item>

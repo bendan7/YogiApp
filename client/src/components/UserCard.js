@@ -3,7 +3,7 @@ import { Card, Button, Alert } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-export default function UserCard({ ClassName, Style }) {
+export default function UserCard({ ClassName, Style, ...props }) {
   const { currentUser, logout } = useAuth();
   const history = useHistory();
   const [error, setError] = useState("");
@@ -27,6 +27,7 @@ export default function UserCard({ ClassName, Style }) {
           </div>
           <div>
             <h3>{currentUser?.displayName} שלום</h3>
+            <h3>מספר כניסות: {props.validEntries}</h3>
             <Link to="update-profile">עדכן פרטים</Link>
           </div>
         </div>

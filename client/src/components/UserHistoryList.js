@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup } from "react-bootstrap";
-import { useAuth } from "../contexts/AuthContext";
 import Colors from "../constants/Colors";
 
 export default function UserHistoryList(props) {
-  const HistoryEntry = (props) => {
+  function HistoryEntry(props) {
     const type = props.type === "meeting" ? "שיעור" : "כרטיסיה";
     const text =
       props.type === "meeting"
         ? `${props.title}-${props.location}`
-        : `מספר כניסות: ${props.num_of_entry}`;
+        : `מספר כניסות: ${props.num_of_entries}`;
 
     const dateStr = `${props.date.getDate()}/${props.date.getMonth() + 1}`;
     const style =
@@ -28,13 +27,13 @@ export default function UserHistoryList(props) {
         </div>
       </ListGroup.Item>
     );
-  };
+  }
 
   return (
     <ListGroup className="p-0 m-0">
-      {props.entries?.map((entry, index) => {
-        return <HistoryEntry key={index} {...entry} />;
-      })}
+      {props.entries?.map((entry, index) => (
+        <HistoryEntry key={index} {...entry} />
+      ))}
     </ListGroup>
   );
 }

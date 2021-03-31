@@ -8,15 +8,6 @@ const cookieParser = require("cookie-parser")();
 const cors = require("cors")({ origin: true });
 const app = express();
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-/*
-exports.helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", { structuredData: true });
-  response.send("Hello from Firebase!");
-});
-*/
-
 const validateFirebaseIdToken = async (req, res, next) => {
   functions.logger.log("Check if request is authorized with Firebase ID token");
 

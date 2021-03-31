@@ -4,6 +4,7 @@ import UserDashboard from "../pages/UserDashboard";
 import Login from "../pages/Login";
 import {} from "react-bootstrap";
 import { AuthProvider } from "../contexts/AuthContext";
+import { RegistrationProvider } from "../contexts/RegistrationContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import ForgotPassword from "../pages/ForgotPassword";
@@ -21,8 +22,14 @@ export default function App() {
         <Router>
           <AuthProvider>
             <Switch>
-              <PrivateRoute exact path="/" component={UserDashboard} />
-              <PrivateRoute path="/update-profile" component={UpdateProfile} />
+              <RegistrationProvider>
+                <PrivateRoute exact path="/" component={UserDashboard} />
+                <PrivateRoute
+                  path="/update-profile"
+                  component={UpdateProfile}
+                />
+              </RegistrationProvider>
+
               <PrivateAdminRoute path="/admin" component={AdminDashboard} />
               <Route path="/signup" component={Signup} />
               <Route path="/login" component={Login} />

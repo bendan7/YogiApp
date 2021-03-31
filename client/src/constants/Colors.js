@@ -1,6 +1,6 @@
 const Colors = {
-  green: "#f3fceb",
+  green: "#ebfced",
   blue: "#ebf0fc",
-  red: "#fcebeb",
+  red: "#fcf6eb",
 };
 module.exports = Colors;
