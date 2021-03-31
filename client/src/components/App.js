@@ -11,12 +11,24 @@ import PrivateAdminRoute from "./PrivateAdminRoute";
 import AdminDashboard from "../pages/AdminDashboard";
 
 export default function App() {
+  const centerImg = {
+    width: "20vw",
+    display: "block",
+    marginLeft: "auto",
+    marginRight: "auto",
+    marginBottom: "2vh",
+  };
   return (
     <div
       className="d-flex align-items-top justify-content-center w-100 p-3"
       style={{ minHeight: "100vh" }}
     >
       <div className="w-100" style={{ maxWidth: "800px" }}>
+        <img
+          alt="logo"
+          style={centerImg}
+          src={process.env.PUBLIC_URL + "/logo.png"}
+        />
         <Router>
           <AuthProvider>
             <Switch>

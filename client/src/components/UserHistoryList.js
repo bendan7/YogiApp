@@ -14,13 +14,12 @@ export default function UserHistoryList(props) {
         : `מספר כניסות: ${props.num_of_entries}`;
 
     const dateStr = `${props.date.getDate()}/${props.date.getMonth() + 1}`;
-    const style =
-      props.type === "meeting"
-        ? { backgroundColor: Colors.blue }
-        : { backgroundColor: Colors.green };
+
+    let variant = props.type === "meeting" ? "info" : "success";
 
     return (
-      <ListGroup.Item className="p-1 bg-" style={style}>
+      <ListGroup.Item variant={variant} className="p-1 bg-">
+        {" "}
         <div className="d-flex flex-row-reverse ">
           <div className="d-flex justify-content-between w-50 ">
             <div>{type}</div>

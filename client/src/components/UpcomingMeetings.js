@@ -37,13 +37,13 @@ export default function UpcomingMeetings(props) {
         const availableSeats = meeting.max_parti - numOfPar;
 
         let meetingOptions = null;
-        let backgroundColor;
+        let variant;
 
         const isUserReg = registered.includes(meeting.id);
 
         if (!isUserReg && availableSeats > 0) {
           // meeting avalivble to regstration
-          backgroundColor = Colors.blue;
+          variant = "info";
 
           const isEntriesLeft = userEntries - registered.length;
           if (isEntriesLeft > 0) {
@@ -51,15 +51,13 @@ export default function UpcomingMeetings(props) {
           }
         } else if (isUserReg) {
           // user is regsterd to this meeting
-          backgroundColor = Colors.green;
           meetingOptions = <UnregisterButton meeting={meeting} />;
+          variant = "success";
         } else {
           // meeting is full
-          backgroundColor = Colors.red;
+          variant = "warning";
           meetingOptions = <h5 className="font-weight-bold">השיעור מלא</h5>;
         }
-
-        let style = { borderRadius: "25px", backgroundColor: backgroundColor };
 
         const date = new Date(meeting.datetime);
         const dateStr = `${date.getDate()}/${date.getMonth() + 1} יום ${
@@ -68,33 +66,41 @@ export default function UpcomingMeetings(props) {
 
         return (
           <ListGroup.Item
+            variant={variant}
             key={meeting.id}
-            className="mt-2 p-1 border shadow-sm"
-            style={style}
+            className="mt-2 p-1 border shadow-sm rounded"
+            //style={style}
           >
-            <div className="d-flex justify-content-around ">
-              <div>
-                <h4 className="m-0">
-                  {date.getUTCHours()}:{date.getUTCMinutes()}
-                </h4>
-                <h5 className="m-0">{dateStr}</h5>
+            <div>
+              <div className="d-flex justify-content-around ">
+                <div>
+                  <h4 className="m-0">
+                    {date.getUTCHours()}:{date.getUTCMinutes()}
+                  </h4>
+                  <h5 className="m-0">{dateStr}</h5>
+                </div>
+                <div className="text-right">
+                  <h3 className="m-0">{meeting?.title}</h3>
+                  <h5 className="m-0">מיקום:{meeting?.loctaion}</h5>
+                </div>
               </div>
-              <div className="text-right">
-                <h3 className="m-0">{meeting?.title}</h3>
-                <h5 className="m-0">מיקום:{meeting?.loctaion}</h5>
-              </div>
-            </div>
-            <div className="mt-2 mb-0 ">
-              {meeting.notes ? (
-                <p style={{ direction: "rtl" }} className="text-right p-2 m-0">
-                  ** {meeting.notes}
-                </p>
-              ) : null}
-              <div>
-                {availableSeats > 0 || isUserReg ? (
-                  <small className="m-0">מקומות זמינים: {availableSeats}</small>
+              <div className="mt-2 mb-0 ">
+                {meeting.notes ? (
+                  <p
+                    style={{ direction: "rtl" }}
+                    className="text-right p-2 m-0"
+                  >
+                    ** {meeting.notes}
+                  </p>
                 ) : null}
-                <div className="m-1">{meetingOptions}</div>
+                <div>
+                  {availableSeats > 0 || isUserReg ? (
+                    <small className="m-0">
+                      מקומות זמינים: {availableSeats}
+                    </small>
+                  ) : null}
+                  <div className="m-1">{meetingOptions}</div>
+                </div>
               </div>
             </div>
           </ListGroup.Item>
