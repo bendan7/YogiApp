@@ -79,6 +79,35 @@ export function RegistrationProvider({ children }) {
     });
   }
 
+  function RegisterToMeeting(meeting) {
+    db.ref("upcoming/")
+      .child(meeting.id)
+      .child("participates")
+      .push({ uid: currentUser.uid });
+  }
+
+  function UnregisterFromMeeting(meeting) {
+    let regKey;
+
+    if (meeting.participates == null) {
+      return null;
+    }
+
+    for (const [key, value] of Object.entries(meeting.participates)) {
+      if (value.uid === currentUser.uid) {
+        regKey = key;
+      }
+    }
+
+    if (regKey) {
+      db.ref("upcoming/")
+        .child(meeting.id)
+        .child("participates")
+        .child(regKey)
+        .remove();
+    }
+  }
+
   useEffect(() => {
     if (currentUser) {
       GetUserInfo();
@@ -91,6 +120,8 @@ export function RegistrationProvider({ children }) {
     registered,
     userHistory,
     userEntries,
+    RegisterToMeeting,
+    UnregisterFromMeeting,
   };
 
   return (

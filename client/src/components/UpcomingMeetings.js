@@ -1,45 +1,19 @@
 import React from "react";
 import { Button, ListGroup } from "react-bootstrap";
-import { db } from "../firebase";
-import { useAuth } from "../contexts/AuthContext";
 import Colors from "../constants/Colors";
 import { useRegistration } from "../contexts/RegistrationContext";
 
 //This component is conncted to realtime db
 export default function UpcomingMeetings(props) {
-  const { currentUser } = useAuth();
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 
-  const { meetings, registered, userEntries } = useRegistration();
-
-  function RegisterToMeeting(meeting) {
-    db.ref("upcoming/")
-      .child(meeting.id)
-      .child("participates")
-      .push({ uid: currentUser.uid });
-  }
-
-  function UnregisterFromMeeting(meeting) {
-    let regKey;
-
-    if (meeting.participates == null) {
-      return null;
-    }
-
-    for (const [key, value] of Object.entries(meeting.participates)) {
-      if (value.uid === currentUser.uid) {
-        regKey = key;
-      }
-    }
-
-    if (regKey) {
-      db.ref("upcoming/")
-        .child(meeting.id)
-        .child("participates")
-        .child(regKey)
-        .remove();
-    }
-  }
+  const {
+    meetings,
+    registered,
+    userEntries,
+    RegisterToMeeting,
+    UnregisterFromMeeting,
+  } = useRegistration();
 
   const RegisterButton = ({ meeting }) => (
     <Button variant="success" onClick={() => RegisterToMeeting(meeting)}>
