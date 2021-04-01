@@ -18,14 +18,14 @@ export default function UserHistoryList(props) {
     let variant = props.type === "meeting" ? "info" : "success";
 
     return (
-      <ListGroup.Item variant={variant} className="p-1 bg-">
+      <ListGroup.Item variant={variant} className="p-1">
         {" "}
         <div className="d-flex flex-row-reverse ">
-          <div className="d-flex justify-content-between w-50 ">
-            <div>{type}</div>
+          <div className="d-flex justify-content-between">
+            <div>{type}-</div>
             <div>{dateStr}</div>
           </div>
-          <div className="w-50">{text}</div>
+          <div className="w-75">{text}</div>
         </div>
       </ListGroup.Item>
     );

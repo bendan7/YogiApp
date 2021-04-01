@@ -29,6 +29,8 @@ export default function App() {
           style={centerImg}
           src={process.env.PUBLIC_URL + "/logo.png"}
         />
+        <h3 className="text-center">מערכת ניהול כרטיסיות</h3>
+
         <Router>
           <AuthProvider>
             <Switch>

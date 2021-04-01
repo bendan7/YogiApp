@@ -28,9 +28,10 @@ export default function UserCard({ ClassName, Style, ...props }) {
             <Button onClick={handleLogout}>התנתק</Button>
           </div>
           <div>
-            <h3>{currentUser?.displayName} שלום</h3>
-            <h3>מספר כניסות: {userEntries - registered.length}</h3>
-            <Link to="update-profile">עדכן פרטים</Link>
+            <h3 className="m-0 ">{currentUser?.displayName} שלום</h3>
+            <Link className="m-0 p-0" to="update-profile">
+              עדכן פרטים
+            </Link>
           </div>
         </div>
       </Card.Body>
@@ -39,6 +40,9 @@ export default function UserCard({ ClassName, Style, ...props }) {
           {error}
         </Alert>
       )}
+      <h5 className=" m-0 p-0 font-weight-bold">
+        מספר כניסות: {userEntries - registered.length}
+      </h5>
     </Card>
   );
 }
