@@ -59,6 +59,12 @@ const validateFirebaseIdToken = async (req, res, next) => {
 
 app.use(cors);
 app.use(cookieParser);
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 app.use(validateFirebaseIdToken);
 
 app.get("/userhistory", async (req, res) => {
@@ -90,6 +96,50 @@ app.get("/userhistory", async (req, res) => {
   };
 
   res.json(userHistory);
+});
+
+app.put("/register/:meetingId", async (req, res) => {
+  const meetingId = req.params.meetingId;
+  const uid = req.user.uid;
+  const meetingRef = await db.collection("upcoming").doc(meetingId);
+
+  meetingRef
+    .get()
+    .then(async (doc) => {
+      const meeting = doc.data();
+      if (meeting.participates.includes(uid) == false) {
+        await meetingRef.update({
+          participates: [...meeting.participates, uid],
+        });
+      }
+      res.status(200).send();
+    })
+    .catch((err) => {
+      res.status(404).send("Meeting ID Not Found");
+    });
+});
+
+app.put("/deregister/:meetingId", async (req, res) => {
+  const meetingId = req.params.meetingId;
+  const uid = req.user.uid;
+  const meetingRef = await db.collection("upcoming").doc(meetingId);
+
+  meetingRef
+    .get()
+    .then(async (doc) => {
+      const meeting = doc.data();
+      const index = meeting.participates.indexOf(uid);
+      if (index > -1) {
+        meeting.participates.splice(index, 1);
+        await meetingRef.update({
+          participates: meeting.participates,
+        });
+      }
+      res.status(200).send();
+    })
+    .catch((err) => {
+      res.status(404).send("Meeting ID Not Found");
+    });
 });
 
 exports.app = functions.region("europe-west3").https.onRequest(app);

@@ -1,9 +1,10 @@
 import React from "react";
-import UpcomingMeetings from "../components/UpcomingMeetings";
+import UpcomingMeetings from "../components/User/UpcomingMeetings";
 import UserCard from "../components/UserCard";
 import CollapseCard from "../components/CollapseCard";
-import UserHistoryList from "../components/UserHistoryList";
-import { RegistrationProvider } from "../contexts/RegistrationContext";
+import UserHistoryList from "../components/User/UserHistoryList";
+import { UserProvider } from "../contexts/UserContext";
+import TicktsCard from "../components/User/TicktsCard";
 
 export default function UserDashboard() {
   const cardsStyle = { backgroundColor: "#f6f7fb" };
@@ -11,8 +12,9 @@ export default function UserDashboard() {
   const maxInfoEntries = 23;
 
   return (
-    <RegistrationProvider>
-      <UserCard ClassName={cardsClassName} Style={cardsStyle} />
+    <UserProvider>
+      <UserCard ClassName={cardsClassName} Style={cardsStyle}></UserCard>
+      <TicktsCard ClassName={cardsClassName} Style={cardsStyle} />
       <CollapseCard
         cardTitle="רישום לשיעורים"
         className={cardsClassName}
@@ -28,6 +30,6 @@ export default function UserDashboard() {
       >
         <UserHistoryList maxInfoEntries={maxInfoEntries} />
       </CollapseCard>
-    </RegistrationProvider>
+    </UserProvider>
   );
 }

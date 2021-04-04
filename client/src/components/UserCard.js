@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { Card, Button, Alert } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { useRegistration } from "../contexts/RegistrationContext";
 
 export default function UserCard({ ClassName, Style, ...props }) {
   const { currentUser, logout } = useAuth();
   const history = useHistory();
   const [error, setError] = useState("");
-  const { registered, userEntries } = useRegistration();
 
   async function handleLogout() {
     try {
@@ -40,9 +38,6 @@ export default function UserCard({ ClassName, Style, ...props }) {
           {error}
         </Alert>
       )}
-      <h5 className=" m-0 p-0 font-weight-bold">
-        מספר כניסות: {userEntries - registered.length}
-      </h5>
     </Card>
   );
 }

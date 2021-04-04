@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, ListGroup } from "react-bootstrap";
-import Colors from "../constants/Colors";
-import { useRegistration } from "../contexts/RegistrationContext";
+import { useUserContext } from "../../contexts/UserContext";
 
 //This component is conncted to realtime db
 export default function UpcomingMeetings(props) {
@@ -13,7 +12,7 @@ export default function UpcomingMeetings(props) {
     userEntries,
     RegisterToMeeting,
     UnregisterFromMeeting,
-  } = useRegistration();
+  } = useUserContext();
 
   const RegisterButton = ({ meeting }) => (
     <Button variant="success" onClick={() => RegisterToMeeting(meeting)}>
@@ -29,7 +28,7 @@ export default function UpcomingMeetings(props) {
 
   return (
     <ListGroup>
-      {meetings.map((meeting) => {
+      {meetings.map((meeting, index) => {
         const numOfPar = meeting.participates
           ? Object.keys(meeting.participates).length
           : 0;
@@ -58,8 +57,8 @@ export default function UpcomingMeetings(props) {
           variant = "warning";
           meetingOptions = <h5 className="font-weight-bold">השיעור מלא</h5>;
         }
+        const date = new Date(meeting.datetime.seconds * 1000);
 
-        const date = new Date(meeting.datetime);
         const dateStr = `${date.getDate()}/${date.getMonth() + 1} יום ${
           days[date.getDay()]
         }`;
@@ -67,7 +66,7 @@ export default function UpcomingMeetings(props) {
         return (
           <ListGroup.Item
             variant={variant}
-            key={meeting.id}
+            key={index}
             className="mt-2 p-1 border shadow-sm rounded"
             //style={style}
           >
@@ -80,8 +79,8 @@ export default function UpcomingMeetings(props) {
                   <h5 className="m-0">{dateStr}</h5>
                 </div>
                 <div className="text-right">
-                  <h3 className="m-0">{meeting?.title}</h3>
-                  <h5 className="m-0">מיקום:{meeting?.loctaion}</h5>
+                  <h3 className="m-0">{meeting?.name}</h3>
+                  <h5 className="m-0">מיקום:{meeting?.location}</h5>
                 </div>
               </div>
               <div className="mt-2 mb-0 ">

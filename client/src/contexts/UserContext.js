@@ -1,18 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
 import { db } from "../firebase";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "./AuthContext";
+import { useMeetingsContext } from "./MeetingContext";
 
-const RegistrationContext = React.createContext();
+const UserContext = React.createContext();
 
-export function useRegistration() {
-  return useContext(RegistrationContext);
+export function useUserContext() {
+  return useContext(UserContext);
 }
 
-export function RegistrationProvider({ children }) {
+export function UserProvider({ children }) {
   const { currentUser, GetAuthHeader } = useAuth();
 
   //upcoming meetings list
-  const [meetings, setMeetings] = useState([]);
+  //const [meetings, setMeetings] = useState([]);
+  const { meetings } = useMeetingsContext();
 
   // registered upcoming meetings ids list
   const [registered, setRegistered] = useState([]);
@@ -22,28 +24,11 @@ export function RegistrationProvider({ children }) {
   const [userHistory, setUserHistory] = useState([]);
   const [userEntries, setUserEntries] = useState(0);
 
-  function GetMeetings() {
-    var upcomingRef = db.ref("upcoming/");
-
-    upcomingRef.on("value", (snapshot) => {
-      // REALTIME DB - onChange
-      const newMeetings = Object.values(snapshot.val());
-      setMeetings(newMeetings);
-
-      const RegisteredMeeting = FindRegisteredMeetings(newMeetings);
-      setRegistered(RegisteredMeeting);
-    });
-  }
-
-  function FindRegisteredMeetings(meetingList) {
+  function FindUserRegisteredMeetings(meetingList) {
     const RegList = [];
 
     meetingList.forEach((meeting) => {
-      const participates = Object.values(meeting.participates).map(
-        (par) => par.uid
-      );
-
-      if (participates.includes(currentUser.uid)) {
+      if (meeting.participates.includes(currentUser.uid)) {
         RegList.push(meeting.id);
       }
     });
@@ -79,54 +64,45 @@ export function RegistrationProvider({ children }) {
     });
   }
 
-  function RegisterToMeeting(meeting) {
-    db.ref("upcoming/")
-      .child(meeting.id)
-      .child("participates")
-      .push({ uid: currentUser.uid });
+  async function RegisterMeeting(meeting) {
+    var headers = await GetAuthHeader();
+    headers.method = "PUT";
+
+    return fetch(
+      `http://localhost:5001/nof-app-dev/europe-west3/app/register/${meeting.id}`,
+      headers,
+      JSON.stringify({ x: 5 })
+    );
   }
 
-  function UnregisterFromMeeting(meeting) {
-    let regKey;
+  async function UnregisterFromMeeting(meeting) {
+    var headers = await GetAuthHeader();
+    headers.method = "PUT";
 
-    if (meeting.participates == null) {
-      return null;
-    }
-
-    for (const [key, value] of Object.entries(meeting.participates)) {
-      if (value.uid === currentUser.uid) {
-        regKey = key;
-      }
-    }
-
-    if (regKey) {
-      db.ref("upcoming/")
-        .child(meeting.id)
-        .child("participates")
-        .child(regKey)
-        .remove();
-    }
+    return fetch(
+      `http://localhost:5001/nof-app-dev/europe-west3/app/deregister/${meeting.id}`,
+      headers,
+      JSON.stringify({ x: 5 })
+    );
   }
 
   useEffect(() => {
     if (currentUser) {
       GetUserInfo();
-      GetMeetings();
     }
-  }, [currentUser]);
+    if (meetings) {
+      setRegistered(FindUserRegisteredMeetings(meetings));
+    }
+  }, [currentUser, meetings]);
 
   const value = {
     meetings,
     registered,
     userHistory,
     userEntries,
-    RegisterToMeeting,
+    RegisterToMeeting: RegisterMeeting,
     UnregisterFromMeeting,
   };
 
-  return (
-    <RegistrationContext.Provider value={value}>
-      {children}
-    </RegistrationContext.Provider>
-  );
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

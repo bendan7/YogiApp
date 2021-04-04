@@ -1,10 +1,9 @@
 import React from "react";
 import { ListGroup } from "react-bootstrap";
-import Colors from "../constants/Colors";
-import { useRegistration } from "../contexts/RegistrationContext";
+import { useUserContext } from "../../contexts/UserContext";
 
 export default function UserHistoryList(props) {
-  const { userHistory } = useRegistration();
+  const { userHistory } = useUserContext();
 
   function HistoryEntry(props) {
     const type = props.type === "meeting" ? "שיעור" : "כרטיסיה";
@@ -13,7 +12,7 @@ export default function UserHistoryList(props) {
         ? `${props.title}-${props.location}`
         : `מספר כניסות: ${props.num_of_entries}`;
 
-    const dateStr = `${props.date.getDate()}/${props.date.getMonth() + 1}`;
+    const dateStr = `${props.date?.getDate()}/${props.date?.getMonth() + 1}`;
 
     let variant = props.type === "meeting" ? "info" : "success";
 
