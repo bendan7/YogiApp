@@ -57,11 +57,6 @@ export default function UpcomingMeetings(props) {
           variant = "warning";
           meetingOptions = <h5 className="font-weight-bold">השיעור מלא</h5>;
         }
-        const date = new Date(meeting.datetime.seconds * 1000);
-
-        const dateStr = `${date.getDate()}/${date.getMonth() + 1} יום ${
-          days[date.getDay()]
-        }`;
 
         return (
           <ListGroup.Item
@@ -73,10 +68,8 @@ export default function UpcomingMeetings(props) {
             <div>
               <div className="d-flex justify-content-around ">
                 <div>
-                  <h4 className="m-0">
-                    {date.getUTCHours()}:{date.getUTCMinutes()}
-                  </h4>
-                  <h5 className="m-0">{dateStr}</h5>
+                  <h4 className="m-0">{meeting.time}</h4>
+                  <h5 className="m-0">{`${meeting.date} יום ${meeting.dayName}`}</h5>
                 </div>
                 <div className="text-right">
                   <h3 className="m-0">{meeting?.name}</h3>

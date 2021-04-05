@@ -36,21 +36,6 @@ export function AuthProvider({ children }) {
     return currentUser.updatePassword(password);
   }
 
-  async function IsUserAdmin(user) {
-    return firestore
-      .collection("admin")
-      .get()
-      .then((querySnapshot) => {
-        for (const doc of querySnapshot.docs) {
-          if (doc.data().uid === user.uid) {
-            return true;
-          }
-        }
-        return false;
-      })
-      .catch(() => false);
-  }
-
   async function GetAuthHeader() {
     if (currentUser == null) {
       return;
@@ -71,12 +56,18 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user && (await IsUserAdmin(user))) {
-        user.isAdmin = true;
+      if (user) {
+        user.getIdTokenResult().then((tokenResult) => {
+          if (tokenResult.claims.isAdmin) {
+            user.isAdmin = true;
+          }
+          setCurrentUser(user);
+          setLoading(false);
+        });
+      } else {
+        setCurrentUser(user);
+        setLoading(false);
       }
-
-      setCurrentUser(user);
-      setLoading(false);
     });
 
     return unsubscribe;

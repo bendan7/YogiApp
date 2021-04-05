@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { db } from "../firebase";
 import { useAuth } from "./AuthContext";
 import { useMeetingsContext } from "./MeetingContext";
 
@@ -13,7 +12,6 @@ export function UserProvider({ children }) {
   const { currentUser, GetAuthHeader } = useAuth();
 
   //upcoming meetings list
-  //const [meetings, setMeetings] = useState([]);
   const { meetings } = useMeetingsContext();
 
   // registered upcoming meetings ids list
@@ -28,9 +26,11 @@ export function UserProvider({ children }) {
     const RegList = [];
 
     meetingList.forEach((meeting) => {
-      if (meeting.participates.includes(currentUser.uid)) {
-        RegList.push(meeting.id);
-      }
+      meeting.participates.forEach((par) => {
+        if (par.uid === currentUser.uid) {
+          RegList.push(meeting.id);
+        }
+      });
     });
 
     return RegList;
@@ -50,7 +50,7 @@ export function UserProvider({ children }) {
         data.tickts.forEach((tickt) => {
           tickt.type = "tickt";
           totalPurchasedEntries += tickt.num_of_entries;
-          tickt.date = new Date(tickt.date._seconds * 1000);
+          tickt.date = new Date(tickt.date?._seconds * 1000);
         });
 
         const validEntries = totalPurchasedEntries - data.meetings.length;
@@ -69,9 +69,8 @@ export function UserProvider({ children }) {
     headers.method = "PUT";
 
     return fetch(
-      `http://localhost:5001/nof-app-dev/europe-west3/app/register/${meeting.id}`,
-      headers,
-      JSON.stringify({ x: 5 })
+      `http://localhost:5001/nof-app-dev/europe-west3/app/meetings/register/${meeting.id}`,
+      headers
     );
   }
 
@@ -80,7 +79,7 @@ export function UserProvider({ children }) {
     headers.method = "PUT";
 
     return fetch(
-      `http://localhost:5001/nof-app-dev/europe-west3/app/deregister/${meeting.id}`,
+      `http://localhost:5001/nof-app-dev/europe-west3/app/meetings/deregister/${meeting.id}`,
       headers,
       JSON.stringify({ x: 5 })
     );

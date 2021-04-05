@@ -98,7 +98,7 @@ app.get("/userhistory", async (req, res) => {
   res.json(userHistory);
 });
 
-app.put("/register/:meetingId", async (req, res) => {
+app.put("/meetings/register/:meetingId", async (req, res) => {
   const meetingId = req.params.meetingId;
   const uid = req.user.uid;
   const meetingRef = await db.collection("upcoming").doc(meetingId);
@@ -109,7 +109,10 @@ app.put("/register/:meetingId", async (req, res) => {
       const meeting = doc.data();
       if (meeting.participates.includes(uid) == false) {
         await meetingRef.update({
-          participates: [...meeting.participates, uid],
+          participates: [
+            ...meeting.participates,
+            { uid: uid, name: req.user.name },
+          ],
         });
       }
       res.status(200).send();
@@ -119,22 +122,21 @@ app.put("/register/:meetingId", async (req, res) => {
     });
 });
 
-app.put("/deregister/:meetingId", async (req, res) => {
+app.put("/meetings/deregister/:meetingId/", async (req, res) => {
   const meetingId = req.params.meetingId;
-  const uid = req.user.uid;
-  const meetingRef = await db.collection("upcoming").doc(meetingId);
 
+  const meetingRef = await db.collection("upcoming").doc(meetingId);
   meetingRef
     .get()
     .then(async (doc) => {
       const meeting = doc.data();
-      const index = meeting.participates.indexOf(uid);
-      if (index > -1) {
-        meeting.participates.splice(index, 1);
-        await meetingRef.update({
-          participates: meeting.participates,
-        });
-      }
+
+      await meetingRef.update({
+        participates: meeting.participates.filter(
+          (par) => par.uid != req.user.uid
+        ),
+      });
+
       res.status(200).send();
     })
     .catch((err) => {
@@ -142,4 +144,52 @@ app.put("/deregister/:meetingId", async (req, res) => {
     });
 });
 
+app.post("/meetings", (req, res) => {
+  console.log("new Meeeting");
+  res.status(200).send();
+});
+
 exports.app = functions.region("europe-west3").https.onRequest(app);
+
+function CreateNewAdmin(change, context) {
+  const userId = change.data().uid;
+  if (userId) {
+    return admin
+      .auth()
+      .setCustomUserClaims(userId, {
+        isAdmin: true,
+      })
+      .then(() => {
+        console.log(`New admin created with UID: ${userId}`);
+      })
+      .catch((error) => {
+        console.error("Error creating admin token:", error);
+      });
+  }
+}
+function RemoveAdmin(change, context) {
+  const userId = change.data().uid;
+  if (userId) {
+    return admin
+      .auth()
+      .setCustomUserClaims(userId, {
+        isAdmin: false,
+      })
+      .then(() => {
+        console.log(`remove admin with UID: ${userId}`);
+      })
+      .catch((error) => {
+        console.error("Error removing admin token:", error);
+      });
+  }
+}
+
+exports.newAdmin = functions
+  .region("europe-west3")
+  .firestore.document("admin/{docId}")
+  .onCreate(CreateNewAdmin);
+
+exports.removeAdmin = functions
+  .region("europe-west3")
+  .firestore.document("admin/{docId}")
+  .onDelete(RemoveAdmin);
