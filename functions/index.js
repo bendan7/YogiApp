@@ -60,11 +60,6 @@ const validateFirebaseIdToken = async (req, res, next) => {
 app.use(cors);
 app.use(cookieParser);
 app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
 app.use(validateFirebaseIdToken);
 
 app.get("/userhistory", async (req, res) => {
@@ -144,9 +139,27 @@ app.put("/meetings/deregister/:meetingId/", async (req, res) => {
     });
 });
 
-app.post("/meetings", (req, res) => {
-  console.log("new Meeeting");
-  res.status(200).send();
+app.post("/meetings", async (req, res) => {
+  if (req.user.isAdmin != true) {
+    return res.status(403).send("Unauthorized");
+  }
+
+  //convert date type to timestamp
+  const timestamp = admin.firestore.Timestamp.fromDate(
+    new Date(req.body.datetime)
+  );
+  req.body.datetime = timestamp;
+
+  await db
+    .collection("upcoming")
+    .add(req.body)
+    .then(() => {
+      res.status(201).send();
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send();
+    });
 });
 
 exports.app = functions.region("europe-west3").https.onRequest(app);

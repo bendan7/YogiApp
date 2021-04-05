@@ -77,12 +77,12 @@ export default function UpcomingMeetings(props) {
                 </div>
               </div>
               <div className="mt-2 mb-0 ">
-                {meeting.notes ? (
+                {meeting.description ? (
                   <p
                     style={{ direction: "rtl" }}
                     className="text-right p-2 m-0"
                   >
-                    ** {meeting.notes}
+                    ** {meeting.description}
                   </p>
                 ) : null}
                 <div>

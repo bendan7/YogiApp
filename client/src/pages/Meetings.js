@@ -23,7 +23,7 @@ export default function Meetings() {
       <Button onClick={() => handleShow(null)} block>
         שיעור חדש
       </Button>
-      <h3 className="mt-4 text-right font-weight-bold">שיעורים עתידים</h3>
+      <h3 className="mt-4 text-right font-weight-bold">שיעורים קרובים</h3>
 
       <MeetingModal
         show={show}

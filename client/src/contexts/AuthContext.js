@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
     return currentUser.updatePassword(password);
   }
 
-  async function GetAuthHeader() {
+  async function GetReq() {
     if (currentUser == null) {
       return;
     }
@@ -46,12 +46,13 @@ export function AuthProvider({ children }) {
       accessToken = token;
     });
 
-    const headers = {
+    const req = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
       },
     };
-    return headers;
+    return req;
   }
 
   useEffect(() => {
@@ -80,7 +81,7 @@ export function AuthProvider({ children }) {
     signup,
     resetPassword,
     updateUserPassword,
-    GetAuthHeader,
+    GetReq,
   };
 
   return (

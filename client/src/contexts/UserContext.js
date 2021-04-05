@@ -9,7 +9,7 @@ export function useUserContext() {
 }
 
 export function UserProvider({ children }) {
-  const { currentUser, GetAuthHeader } = useAuth();
+  const { currentUser, GetReq } = useAuth();
 
   //upcoming meetings list
   const { meetings } = useMeetingsContext();
@@ -25,8 +25,8 @@ export function UserProvider({ children }) {
   function FindUserRegisteredMeetings(meetingList) {
     const RegList = [];
 
-    meetingList.forEach((meeting) => {
-      meeting.participates.forEach((par) => {
+    meetingList?.forEach((meeting) => {
+      meeting.participates?.forEach((par) => {
         if (par.uid === currentUser.uid) {
           RegList.push(meeting.id);
         }
@@ -37,35 +37,37 @@ export function UserProvider({ children }) {
   }
 
   async function GetUserInfo() {
-    var headers = await GetAuthHeader();
+    const req = await GetReq();
+    fetch("/userhistory", req).then((res) => {
+      res
+        .json()
+        .then((data) => {
+          data.meetings.forEach((meeting) => {
+            meeting.type = "meeting";
+            meeting.date = new Date(meeting.date._seconds * 1000);
+          });
 
-    fetch("/userhistory", headers).then((res) => {
-      res.json().then((data) => {
-        data.meetings.forEach((meeting) => {
-          meeting.type = "meeting";
-          meeting.date = new Date(meeting.date._seconds * 1000);
-        });
+          let totalPurchasedEntries = 0;
+          data.tickts.forEach((tickt) => {
+            tickt.type = "tickt";
+            totalPurchasedEntries += tickt.num_of_entries;
+            tickt.date = new Date(tickt.date?._seconds * 1000);
+          });
 
-        let totalPurchasedEntries = 0;
-        data.tickts.forEach((tickt) => {
-          tickt.type = "tickt";
-          totalPurchasedEntries += tickt.num_of_entries;
-          tickt.date = new Date(tickt.date?._seconds * 1000);
-        });
+          const validEntries = totalPurchasedEntries - data.meetings.length;
+          setUserEntries(validEntries);
 
-        const validEntries = totalPurchasedEntries - data.meetings.length;
-        setUserEntries(validEntries);
+          const history = data.meetings.concat(data.tickts);
+          history.sort((a, b) => b.date - a.date);
 
-        const history = data.meetings.concat(data.tickts);
-        history.sort((a, b) => b.date - a.date);
-
-        setUserHistory(history);
-      });
+          setUserHistory(history);
+        })
+        .catch((err) => console.log(err));
     });
   }
 
   async function RegisterMeeting(meeting) {
-    var headers = await GetAuthHeader();
+    const headers = await GetReq();
     headers.method = "PUT";
 
     return fetch(
@@ -75,7 +77,7 @@ export function UserProvider({ children }) {
   }
 
   async function UnregisterFromMeeting(meeting) {
-    var headers = await GetAuthHeader();
+    const headers = await GetReq();
     headers.method = "PUT";
 
     return fetch(

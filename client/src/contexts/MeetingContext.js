@@ -9,7 +9,7 @@ export function useMeetingsContext() {
 }
 
 export function MeetingProvider({ children }) {
-  const { currentUser } = useAuth();
+  const { currentUser, GetReq } = useAuth();
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
   //upcoming meetings list
   const [meetings, setMeetings] = useState([]);
@@ -38,6 +38,17 @@ export function MeetingProvider({ children }) {
       });
   }
 
+  async function NewMeeting(meeting) {
+    const requestOptions = await GetReq();
+    requestOptions.method = "post";
+    requestOptions.body = JSON.stringify(meeting);
+    console.log(requestOptions);
+    return fetch(
+      `http://localhost:5001/nof-app-dev/europe-west3/app/meetings/`,
+      requestOptions
+    );
+  }
+
   useEffect(() => {
     if (currentUser) {
       return ConnectMeetingsDB();
@@ -46,6 +57,7 @@ export function MeetingProvider({ children }) {
 
   const value = {
     meetings,
+    NewMeeting,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

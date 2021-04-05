@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button, ListGroup, Modal, Form } from "react-bootstrap";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
+import { useMeetingsContext } from "../../contexts/MeetingContext";
+import firebase from "firebase/app";
 
 export default function MeetingModal({ meeting, ...props }) {
   const [isNewClass, setIsNewClass] = useState();
   const [isEditMode, setIsEditMode] = useState();
   const [date, setDate] = useState();
-
+  const { NewMeeting } = useMeetingsContext();
   const handleClose = props.handleClose;
   const nameRef = useRef();
   const locationRef = useRef();
@@ -18,9 +20,8 @@ export default function MeetingModal({ meeting, ...props }) {
   useEffect(() => {
     const isNewClass = meeting ? false : true;
     setIsNewClass(isNewClass);
-
+    //new Date().toJSON();
     isNewClass ? setIsEditMode(true) : setIsEditMode(false);
-
     const date = isNewClass ? new Date() : meeting.dateObj;
     setDate(date);
   }, [meeting]);
@@ -28,13 +29,21 @@ export default function MeetingModal({ meeting, ...props }) {
   const className = "text-right";
 
   function handleSubmit() {
-    console.log("handleSubmit");
-    console.log(nameRef.current.value);
-    console.log(locationRef.current.value);
-    console.log(maxPartiRef.current.value);
-    console.log(date);
-    console.log(descriptionRef.current.value);
-    fetch("/m");
+    console.log("handleSubmit!");
+
+    const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+    console.log(date.toJSON());
+    const newMeeting = {
+      name: nameRef.current.value,
+      location: locationRef.current.value,
+      description: descriptionRef.current.value,
+      max_parti: maxPartiRef.current.value,
+      datetime: date,
+      participates: [],
+    };
+
+    NewMeeting(newMeeting);
   }
 
   return (
