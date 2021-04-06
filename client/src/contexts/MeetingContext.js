@@ -12,7 +12,7 @@ export function MeetingProvider({ children }) {
   const { currentUser, GetReq } = useAuth();
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
   //upcoming meetings list
-  const [meetings, setMeetings] = useState([]);
+  const [meetings, setMeetings] = useState();
 
   function ConnectMeetingsDB() {
     return firestore
@@ -25,7 +25,11 @@ export function MeetingProvider({ children }) {
           const meetingObj = doc.data();
 
           meetingObj.id = doc.id;
+
+          //timestamp to date
           const date = new Date(meetingObj.datetime.seconds * 1000);
+
+          //Add extra date and time strings for UI
           meetingObj.dateObj = date;
           meetingObj.date = `${date.getDate()}/${date.getMonth() + 1}`;
           meetingObj.dayName = days[date.getDay()];
@@ -33,7 +37,6 @@ export function MeetingProvider({ children }) {
 
           return meetingObj;
         });
-
         setMeetings(newMeetings);
       });
   }
@@ -42,7 +45,7 @@ export function MeetingProvider({ children }) {
     const requestOptions = await GetReq();
     requestOptions.method = "post";
     requestOptions.body = JSON.stringify(meeting);
-    console.log(requestOptions);
+
     return fetch(
       `http://localhost:5001/nof-app-dev/europe-west3/app/meetings/`,
       requestOptions
@@ -51,9 +54,9 @@ export function MeetingProvider({ children }) {
 
   useEffect(() => {
     if (currentUser) {
-      return ConnectMeetingsDB();
+      ConnectMeetingsDB();
     }
-  }, []);
+  }, [currentUser]);
 
   const value = {
     meetings,

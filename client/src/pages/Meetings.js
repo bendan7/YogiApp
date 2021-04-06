@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, ListGroup } from "react-bootstrap";
 
 import {} from "react-router-dom";
@@ -32,7 +32,7 @@ export default function Meetings() {
       />
 
       <ListGroup className="p-0 m-0">
-        {meetings.map((meeting) => {
+        {meetings?.map((meeting) => {
           return (
             <ListGroup.Item key={meeting.id} variant={"info"} className="p-1">
               <div className="d-flex justify-content-between flex-row-reverse align-items-center">

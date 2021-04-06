@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Button, ListGroup, Modal, Form } from "react-bootstrap";
+import { Button, ListGroup, Modal, Form, Alert } from "react-bootstrap";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import { useMeetingsContext } from "../../contexts/MeetingContext";
-import firebase from "firebase/app";
 
 export default function MeetingModal({ meeting, ...props }) {
-  const [isNewClass, setIsNewClass] = useState();
+  const [isNewMeeting, setIsNewMeeting] = useState();
   const [isEditMode, setIsEditMode] = useState();
+  const [errorMsg, setErrorMsg] = useState();
+
   const [date, setDate] = useState();
   const { NewMeeting } = useMeetingsContext();
   const handleClose = props.handleClose;
@@ -19,21 +20,42 @@ export default function MeetingModal({ meeting, ...props }) {
 
   useEffect(() => {
     const isNewClass = meeting ? false : true;
-    setIsNewClass(isNewClass);
-    //new Date().toJSON();
+    setIsNewMeeting(isNewClass);
+
     isNewClass ? setIsEditMode(true) : setIsEditMode(false);
     const date = isNewClass ? new Date() : meeting.dateObj;
     setDate(date);
-  }, [meeting]);
+    setErrorMsg();
+  }, [meeting, props.show]);
 
   const className = "text-right";
 
-  function handleSubmit() {
+  function CreateNewMeeting(e) {
+    e.preventDefault();
+
     console.log("handleSubmit!");
 
-    const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+    let errors = [];
 
-    console.log(date.toJSON());
+    if (nameRef.current.value.length < 3) {
+      errors.push("שם השיעור לא תקין");
+    }
+    if (locationRef.current.value.length < 3) {
+      errors.push("מיקום השיעור לא תקין");
+    }
+    if (maxPartiRef.current.value < 1) {
+      errors.push("מספר משתתפים לא תקין");
+    }
+    const now = new Date();
+    if (date - now < 0) {
+      errors.push("תאריך/שעה לא תקינים");
+    }
+
+    if (errors.length > 0) {
+      setErrorMsg(errors.join(", "));
+      return;
+    }
+
     const newMeeting = {
       name: nameRef.current.value,
       location: locationRef.current.value,
@@ -46,18 +68,67 @@ export default function MeetingModal({ meeting, ...props }) {
     NewMeeting(newMeeting);
   }
 
+  function GetModalAction() {
+    let actionNeme;
+    let buttVariant;
+    let action;
+
+    if (isEditMode && isNewMeeting) {
+      //Create new meeting
+      actionNeme = "צור מפגש חדש";
+      buttVariant = "success";
+      action = CreateNewMeeting;
+    } else if (isEditMode && !isNewMeeting) {
+      //Edit mode of existing meeting
+      actionNeme = "עדכן פרטים";
+      buttVariant = "success";
+      action = null;
+    } else {
+      //View mode of existing meeting
+      actionNeme = "סיים שיעור";
+      buttVariant = "primary";
+      action = null;
+    }
+
+    return (
+      <Button block variant={buttVariant} onClick={action}>
+        {actionNeme}
+      </Button>
+    );
+  }
+
+  function GetModalHeader() {
+    if (isEditMode && isNewMeeting) {
+      //Create new meeting
+      return <h3>מפגש חדש</h3>;
+    } else if (isEditMode && !isNewMeeting) {
+      //Edit mode of existing meeting
+      return <Button variant="danger">Delete/Cancel</Button>;
+    } else {
+      //View mode of existing meeting
+      return (
+        <Button variant="warning" onClick={() => setIsEditMode(true)}>
+          EDIT
+        </Button>
+      );
+    }
+  }
+
   return (
     <Modal
       className="text-right"
       centered
+      scrollable={true}
       show={props.show}
       onHide={handleClose}
     >
-      <Modal.Header closeButton>
-        <button>Delete/Cancel</button>
-        <button onClick={() => setIsEditMode(true)}>EDIT</button>
-      </Modal.Header>
+      <Modal.Header closeButton>{GetModalHeader()}</Modal.Header>
       <Modal.Body>
+        {errorMsg ? (
+          <Alert key={1} variant="danger">
+            {errorMsg}
+          </Alert>
+        ) : null}
         <Form.Group controlId="formBasicName">
           <Form.Label>שם שיעור</Form.Label>
           <Form.Control
@@ -114,32 +185,35 @@ export default function MeetingModal({ meeting, ...props }) {
             ref={descriptionRef}
             type="text"
           />
+          <PrticipatesList
+            participates={meeting?.participates}
+            editable={isEditMode}
+          />
         </Form.Group>
-        <h5>:רשומים</h5>
-        <ListGroup className="p-0 m-0">
-          {meeting?.participates.map((par) => (
-            <ListGroup.Item key={par.uid} variant="secondary" className="p-1">
-              <div className="d-flex justify-content-between flex-row-reverse align-items-center">
-                <div className="d-flex justify-content-between">{par.name}</div>
-                {isEditMode ? (
-                  <Button variant="danger" size="sm">
-                    X
-                  </Button>
-                ) : null}
-              </div>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
       </Modal.Body>
-      <Modal.Footer>
-        {isEditMode ? (
-          <Button onClick={handleSubmit}> סיים עריכה</Button>
-        ) : (
-          <Button variant="primary" onClick={handleSubmit}>
-            סיים שיעור
-          </Button>
-        )}
-      </Modal.Footer>
+      <Modal.Footer>{GetModalAction()}</Modal.Footer>
     </Modal>
   );
+}
+
+function PrticipatesList({ participates, editable, onDelete }) {
+  return participates && participates.length > 0 ? (
+    <>
+      <h5>:רשומים</h5>
+      <ListGroup className="p-0 m-0">
+        {participates.map((par) => (
+          <ListGroup.Item key={par.uid} variant="secondary" className="p-1">
+            <div className="d-flex justify-content-between flex-row-reverse align-items-center">
+              <div className="d-flex justify-content-between">{par.name}</div>
+              {editable ? (
+                <Button variant="danger" size="sm">
+                  X
+                </Button>
+              ) : null}
+            </div>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
+    </>
+  ) : null;
 }
