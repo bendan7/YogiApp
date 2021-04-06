@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { auth, firestore } from "../firebase";
+import { auth } from "../firebase";
 
 const AuthContext = React.createContext();
 
@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
     return currentUser.updatePassword(password);
   }
 
-  async function GetReq() {
+  async function GetHttpReq() {
     if (currentUser == null) {
       return;
     }
@@ -81,7 +81,7 @@ export function AuthProvider({ children }) {
     signup,
     resetPassword,
     updateUserPassword,
-    GetReq,
+    GetHttpReq,
   };
 
   return (

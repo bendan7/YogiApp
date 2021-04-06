@@ -9,21 +9,20 @@ export function useMeetingsContext() {
 }
 
 export function MeetingProvider({ children }) {
-  const { currentUser, GetReq } = useAuth();
+  const { currentUser } = useAuth();
   const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+
   //upcoming meetings list
   const [meetings, setMeetings] = useState();
 
+  // REALTIME DB - onChange
   function ConnectMeetingsDB() {
     return firestore
       .collection("upcoming")
       .orderBy("datetime")
       .onSnapshot((snapshot) => {
-        // REALTIME DB - onChange
-
         const newMeetings = snapshot.docs.map((doc) => {
           const meetingObj = doc.data();
-
           meetingObj.id = doc.id;
 
           //timestamp to date
@@ -43,19 +42,19 @@ export function MeetingProvider({ children }) {
       });
   }
 
+  //protected by security rules. Only admin can add new meeting
   async function NewMeeting(meeting) {
-    const requestOptions = await GetReq();
-    requestOptions.method = "post";
-    requestOptions.body = JSON.stringify(meeting);
-
-    return fetch(
-      `http://localhost:5001/nof-app-dev/europe-west3/app/meetings/`,
-      requestOptions
-    );
+    return firestore.collection("upcoming").add(meeting);
   }
 
-  function DeleteMeeting(meeting) {
-    return firestore.collection("upcoming").doc(meeting.id).delete();
+  //protected by security rules. Only admin can add new meeting
+  function DeleteMeeting(meetingId) {
+    return firestore.collection("upcoming").doc(meetingId).delete();
+  }
+
+  //protected by security rules. Only admin can add new meeting
+  function UpdateMeeting(meetingId, meeting) {
+    return firestore.collection("upcoming").doc(meetingId).update(meeting);
   }
 
   useEffect(() => {
@@ -68,6 +67,7 @@ export function MeetingProvider({ children }) {
     meetings,
     NewMeeting,
     DeleteMeeting,
+    UpdateMeeting,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

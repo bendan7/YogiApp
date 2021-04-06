@@ -1,13 +1,12 @@
 import React from "react";
 import { Button, ListGroup } from "react-bootstrap";
 import { useUserContext } from "../../contexts/UserContext";
+import { useMeetingsContext } from "../../contexts/MeetingContext";
 
 //This component is conncted to realtime db
 export default function UpcomingMeetings(props) {
-  const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-
+  const { meetings } = useMeetingsContext();
   const {
-    meetings,
     registered,
     userEntries,
     RegisterToMeeting,
@@ -28,7 +27,7 @@ export default function UpcomingMeetings(props) {
 
   return (
     <ListGroup>
-      {meetings.map((meeting, index) => {
+      {meetings?.map((meeting, index) => {
         const numOfPar = meeting.participates
           ? Object.keys(meeting.participates).length
           : 0;
@@ -73,14 +72,14 @@ export default function UpcomingMeetings(props) {
                 </div>
                 <div className="text-right">
                   <h3 className="m-0">{meeting?.name}</h3>
-                  <h5 className="m-0">מיקום:{meeting?.location}</h5>
+                  <h5 className="m-0 pl-2">{meeting?.location}</h5>
                 </div>
               </div>
               <div className="mt-2 mb-0 ">
                 {meeting.description ? (
                   <p
                     style={{ direction: "rtl" }}
-                    className="text-right p-2 m-0"
+                    className="text-right p-0 m-0"
                   >
                     ** {meeting.description}
                   </p>
@@ -91,7 +90,7 @@ export default function UpcomingMeetings(props) {
                       מקומות זמינים: {availableSeats}
                     </small>
                   ) : null}
-                  <div className="m-1">{meetingOptions}</div>
+                  <div className="m-0">{meetingOptions}</div>
                 </div>
               </div>
             </div>

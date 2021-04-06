@@ -2,7 +2,7 @@
   "name": "nof-app",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5001/nof-app-dev/europe-west3/app",
+  "proxy": "https://europe-west3-nof-app-dev.cloudfunctions.net/app",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",

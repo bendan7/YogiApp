@@ -96,21 +96,30 @@ app.get("/userhistory", async (req, res) => {
 app.put("/meetings/register/:meetingId", async (req, res) => {
   const meetingId = req.params.meetingId;
   const uid = req.user.uid;
-  const meetingRef = await db.collection("upcoming").doc(meetingId);
 
+  if (uid == null) {
+    return res.status(403).send("Unauthorized");
+  }
+
+  const meetingRef = await db.collection("upcoming").doc(meetingId);
   meetingRef
     .get()
     .then(async (doc) => {
       const meeting = doc.data();
-      if (meeting.participates.includes(uid) == false) {
+      if (
+        meeting.participates.includes(uid) == false &&
+        meeting.participates.length < meeting.max_parti
+      ) {
         await meetingRef.update({
           participates: [
             ...meeting.participates,
             { uid: uid, name: req.user.name },
           ],
         });
+        return res.status(200).send();
+      } else {
+        return res.status(400).send();
       }
-      res.status(200).send();
     })
     .catch((err) => {
       res.status(404).send("Meeting ID Not Found");
@@ -120,6 +129,11 @@ app.put("/meetings/register/:meetingId", async (req, res) => {
 app.put("/meetings/deregister/:meetingId/", async (req, res) => {
   const meetingId = req.params.meetingId;
 
+  const uid = req.user.uid;
+  if (uid == null) {
+    return res.status(403).send("Unauthorized");
+  }
+
   const meetingRef = await db.collection("upcoming").doc(meetingId);
   meetingRef
     .get()
@@ -127,9 +141,7 @@ app.put("/meetings/deregister/:meetingId/", async (req, res) => {
       const meeting = doc.data();
 
       await meetingRef.update({
-        participates: meeting.participates.filter(
-          (par) => par.uid != req.user.uid
-        ),
+        participates: meeting.participates.filter((par) => par.uid != uid),
       });
 
       res.status(200).send();
@@ -144,7 +156,7 @@ app.post("/meetings", async (req, res) => {
     return res.status(403).send("Unauthorized");
   }
 
-  //convert date type to timestamp
+  // convert date type to timestamp
   const timestamp = admin.firestore.Timestamp.fromDate(
     new Date(req.body.datetime)
   );
@@ -196,12 +208,10 @@ function RemoveAdmin(change, context) {
       });
   }
 }
-
 exports.newAdmin = functions
   .region("europe-west3")
   .firestore.document("admin/{docId}")
   .onCreate(CreateNewAdmin);
-
 exports.removeAdmin = functions
   .region("europe-west3")
   .firestore.document("admin/{docId}")

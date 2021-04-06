@@ -9,9 +9,11 @@ export default function MeetingModal({ meeting, ...props }) {
   const [isEditMode, setIsEditMode] = useState();
   const [errorMsg, setErrorMsg] = useState();
 
-  const [date, setDate] = useState();
-  const { NewMeeting, DeleteMeeting } = useMeetingsContext();
+  const { NewMeeting, DeleteMeeting, UpdateMeeting } = useMeetingsContext();
   const handleClose = props.handleClose;
+
+  const [date, setDate] = useState();
+
   const nameRef = useRef();
   const locationRef = useRef();
   const maxPartiRef = useRef();
@@ -30,11 +32,7 @@ export default function MeetingModal({ meeting, ...props }) {
 
   const className = "text-right";
 
-  function CreateNewMeeting(e) {
-    e.preventDefault();
-
-    console.log("handleSubmit!");
-
+  function ValidFields() {
     let errors = [];
 
     if (nameRef.current.value.length < 3) {
@@ -50,13 +48,11 @@ export default function MeetingModal({ meeting, ...props }) {
     if (date - now < 0) {
       errors.push("תאריך/שעה לא תקינים");
     }
+    return errors;
+  }
 
-    if (errors.length > 0) {
-      setErrorMsg(errors.join(", "));
-      return;
-    }
-
-    const newMeeting = {
+  function GetMeetingObjFromFields() {
+    return {
       name: nameRef.current.value,
       location: locationRef.current.value,
       description: descriptionRef.current.value,
@@ -64,6 +60,18 @@ export default function MeetingModal({ meeting, ...props }) {
       datetime: date,
       participates: [],
     };
+  }
+
+  function OnNewMeeting(e) {
+    e.preventDefault();
+
+    const errors = ValidFields();
+    if (errors.length > 0) {
+      setErrorMsg(errors.join(", "));
+      return;
+    }
+
+    const newMeeting = GetMeetingObjFromFields();
 
     NewMeeting(newMeeting)
       .then(() => {
@@ -74,11 +82,32 @@ export default function MeetingModal({ meeting, ...props }) {
       });
   }
 
+  function OnUpdateMeeting(e) {
+    e.preventDefault();
+
+    const errors = ValidFields();
+
+    if (errors.length > 0) {
+      setErrorMsg(errors.join(", "));
+      return;
+    }
+    const newMeeting = GetMeetingObjFromFields();
+
+    UpdateMeeting(meeting.id, newMeeting)
+      .then(() => {
+        setIsEditMode(false);
+      })
+      .catch((err) => {
+        setErrorMsg("נכשל בעדכון הפרטים");
+      });
+  }
+
   function OnDeleteMeeting(e) {
     e.preventDefault();
+
     setIsEditMode(false);
 
-    DeleteMeeting(meeting)
+    DeleteMeeting(meeting.id)
       .then(() => {
         handleClose();
       })
@@ -96,12 +125,12 @@ export default function MeetingModal({ meeting, ...props }) {
       //Create new meeting
       actionNeme = "צור מפגש חדש";
       buttVariant = "success";
-      action = CreateNewMeeting;
+      action = OnNewMeeting;
     } else if (isEditMode && !isNewMeeting) {
       //Edit mode of existing meeting
       actionNeme = "עדכן פרטים";
       buttVariant = "success";
-      action = null;
+      action = OnUpdateMeeting;
     } else {
       //View mode of existing meeting
       actionNeme = "סיים שיעור";
@@ -137,6 +166,18 @@ export default function MeetingModal({ meeting, ...props }) {
     }
   }
 
+  function RemovePar(uid) {
+    const newMeeting = GetMeetingObjFromFields();
+
+    newMeeting.participates = meeting.participates.filter(
+      (par) => par.uid !== uid
+    );
+    UpdateMeeting(meeting.id, newMeeting).catch((err) => {
+      setErrorMsg("נכשל בעדכון הפרטים");
+      setIsEditMode(false);
+    });
+  }
+
   return (
     <Modal
       className="text-right"
@@ -149,7 +190,7 @@ export default function MeetingModal({ meeting, ...props }) {
       <Modal.Body>
         {errorMsg ? <Alert variant="danger">{errorMsg}</Alert> : null}
         <Form.Group controlId="formBasicName">
-          <Form.Label>שם שיעור</Form.Label>
+          <Form.Label>שם מפגש</Form.Label>
           <Form.Control
             className={className}
             disabled={!isEditMode}
@@ -207,6 +248,7 @@ export default function MeetingModal({ meeting, ...props }) {
           <PrticipatesList
             participates={meeting?.participates}
             editable={isEditMode}
+            onDelete={RemovePar}
           />
         </Form.Group>
       </Modal.Body>
@@ -225,7 +267,11 @@ function PrticipatesList({ participates, editable, onDelete }) {
             <div className="d-flex justify-content-between flex-row-reverse align-items-center">
               <div className="d-flex justify-content-between">{par.name}</div>
               {editable ? (
-                <Button variant="danger" size="sm">
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => onDelete(par.uid)}
+                >
                   X
                 </Button>
               ) : null}

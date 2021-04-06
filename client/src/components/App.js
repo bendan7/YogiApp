@@ -9,12 +9,13 @@ import PrivateRoute from "./PrivateRoute";
 import ForgotPassword from "../pages/ForgotPassword";
 import UpdateProfile from "../pages/UpdateProfile";
 import PrivateAdminRoute from "./PrivateAdminRoute";
-import AdminDashboard from "../pages/AdminDashboard";
-import Meetings from "../pages/Meetings";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import Meetings from "../pages/admin/Meetings";
 
 export default function App() {
   const centerImg = {
-    width: "20vw",
+    width: "25vw",
+    maxWidth: "120px",
     display: "block",
     marginLeft: "auto",
     marginRight: "auto",

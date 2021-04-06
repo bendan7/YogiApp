@@ -9,7 +9,7 @@ export function useUserContext() {
 }
 
 export function UserProvider({ children }) {
-  const { currentUser, GetReq } = useAuth();
+  const { currentUser, GetHttpReq } = useAuth();
 
   //upcoming meetings list
   const { meetings } = useMeetingsContext();
@@ -37,7 +37,7 @@ export function UserProvider({ children }) {
   }
 
   async function GetUserInfo() {
-    const req = await GetReq();
+    const req = await GetHttpReq();
     fetch("/userhistory", req).then((res) => {
       res
         .json()
@@ -67,24 +67,15 @@ export function UserProvider({ children }) {
   }
 
   async function RegisterMeeting(meeting) {
-    const headers = await GetReq();
-    headers.method = "PUT";
-
-    return fetch(
-      `http://localhost:5001/nof-app-dev/europe-west3/app/meetings/register/${meeting.id}`,
-      headers
-    );
+    const httpReq = await GetHttpReq();
+    httpReq.method = "PUT";
+    return fetch(`/meetings/register/${meeting.id}`, httpReq);
   }
 
   async function UnregisterFromMeeting(meeting) {
-    const headers = await GetReq();
-    headers.method = "PUT";
-
-    return fetch(
-      `http://localhost:5001/nof-app-dev/europe-west3/app/meetings/deregister/${meeting.id}`,
-      headers,
-      JSON.stringify({ x: 5 })
-    );
+    const httpReq = await GetHttpReq();
+    httpReq.method = "PUT";
+    return fetch(`/meetings/deregister/${meeting.id}`, httpReq);
   }
 
   useEffect(() => {
@@ -94,10 +85,9 @@ export function UserProvider({ children }) {
     if (meetings) {
       setRegistered(FindUserRegisteredMeetings(meetings));
     }
-  }, [currentUser, meetings]);
+  }, [currentUser]);
 
   const value = {
-    meetings,
     registered,
     userHistory,
     userEntries,

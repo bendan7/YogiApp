@@ -9,5 +9,5 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2017,
   },
-  rules: {},
+  rules: { "require-jsdoc": 0 },
 };

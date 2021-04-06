@@ -1,8 +1,8 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import UserCard from "../components/UserCard";
-import {} from "../contexts/AuthContext";
+import UserCard from "../../components/UserCard";
+import {} from "../../contexts/AuthContext";
 
 export default function AdminDashboard() {
   const cardClassName = "text-center mb-4 shadow-sm";
