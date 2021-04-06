@@ -33,7 +33,9 @@ export function MeetingProvider({ children }) {
           meetingObj.dateObj = date;
           meetingObj.date = `${date.getDate()}/${date.getMonth() + 1}`;
           meetingObj.dayName = days[date.getDay()];
-          meetingObj.time = `${date.getHours()}:${date.getMinutes()}`;
+          meetingObj.time = `${date.getHours()}:${
+            (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
+          }`;
 
           return meetingObj;
         });
@@ -52,6 +54,10 @@ export function MeetingProvider({ children }) {
     );
   }
 
+  function DeleteMeeting(meeting) {
+    return firestore.collection("upcoming").doc(meeting.id).delete();
+  }
+
   useEffect(() => {
     if (currentUser) {
       ConnectMeetingsDB();
@@ -61,6 +67,7 @@ export function MeetingProvider({ children }) {
   const value = {
     meetings,
     NewMeeting,
+    DeleteMeeting,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

@@ -10,7 +10,7 @@ export default function MeetingModal({ meeting, ...props }) {
   const [errorMsg, setErrorMsg] = useState();
 
   const [date, setDate] = useState();
-  const { NewMeeting } = useMeetingsContext();
+  const { NewMeeting, DeleteMeeting } = useMeetingsContext();
   const handleClose = props.handleClose;
   const nameRef = useRef();
   const locationRef = useRef();
@@ -65,7 +65,26 @@ export default function MeetingModal({ meeting, ...props }) {
       participates: [],
     };
 
-    NewMeeting(newMeeting);
+    NewMeeting(newMeeting)
+      .then(() => {
+        handleClose();
+      })
+      .catch(() => {
+        setErrorMsg("נכשל ביצירת המפגש");
+      });
+  }
+
+  function OnDeleteMeeting(e) {
+    e.preventDefault();
+    setIsEditMode(false);
+
+    DeleteMeeting(meeting)
+      .then(() => {
+        handleClose();
+      })
+      .catch(() => {
+        setErrorMsg("נכשל במחיקת השיעור");
+      });
   }
 
   function GetModalAction() {
@@ -103,7 +122,11 @@ export default function MeetingModal({ meeting, ...props }) {
       return <h3>מפגש חדש</h3>;
     } else if (isEditMode && !isNewMeeting) {
       //Edit mode of existing meeting
-      return <Button variant="danger">Delete/Cancel</Button>;
+      return (
+        <Button variant="danger" size="sm" onClick={OnDeleteMeeting}>
+          Delete/Cancel
+        </Button>
+      );
     } else {
       //View mode of existing meeting
       return (
@@ -124,11 +147,7 @@ export default function MeetingModal({ meeting, ...props }) {
     >
       <Modal.Header closeButton>{GetModalHeader()}</Modal.Header>
       <Modal.Body>
-        {errorMsg ? (
-          <Alert key={1} variant="danger">
-            {errorMsg}
-          </Alert>
-        ) : null}
+        {errorMsg ? <Alert variant="danger">{errorMsg}</Alert> : null}
         <Form.Group controlId="formBasicName">
           <Form.Label>שם שיעור</Form.Label>
           <Form.Control
@@ -139,6 +158,19 @@ export default function MeetingModal({ meeting, ...props }) {
             ref={nameRef}
             type="text"
           />
+        </Form.Group>
+        <Form.Group controlId="formBasicDatetime">
+          <div className="text-left d-flex justify-content-between">
+            <DatePicker
+              disabled={!isEditMode}
+              selected={date}
+              onChange={(date) => setDate(date)}
+              showTimeSelect
+              dateFormat="MMMM d, h:mm aa"
+              ref={datetimeRef}
+            />
+            <span> תאריך/שעה</span>
+          </div>
         </Form.Group>
         <Form.Group controlId="formBasicLocation">
           <Form.Label>מיקום</Form.Label>
@@ -161,19 +193,6 @@ export default function MeetingModal({ meeting, ...props }) {
             ref={maxPartiRef}
             type="number"
           />
-        </Form.Group>
-        <Form.Group controlId="formBasicDatetime">
-          <div className="text-left d-flex justify-content-between">
-            <DatePicker
-              disabled={!isEditMode}
-              selected={date}
-              onChange={(date) => setDate(date)}
-              showTimeSelect
-              dateFormat="MMMM d, h:mm aa"
-              ref={datetimeRef}
-            />
-            <span> תאריך/שעה</span>
-          </div>
         </Form.Group>
         <Form.Group controlId="formBasicDescription">
           <Form.Label>תיאור</Form.Label>
