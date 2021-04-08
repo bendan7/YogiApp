@@ -57,6 +57,12 @@ export default function Login() {
           <div className="w-100 text-center mt-3">
             <Link to="forgot-password">? שכחת סיסמה</Link>
           </div>
+          <div className="pt-5">
+            <h5>Demo</h5>
+            <p>User: nofar@gmail.com Pass: 123456</p>
+            <p>Admin: bendan7@gmail.com Pass: 123456</p>
+          </div>
+
           {error && (
             <Alert className=" mt-3 mb-0 text-center" variant="danger">
               {error}

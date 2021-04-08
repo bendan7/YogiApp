@@ -38,10 +38,14 @@ export function UserProvider({ children }) {
 
   async function GetUserInfo() {
     const req = await GetHttpReq();
-    fetch("/userhistory", req).then((res) => {
-      res
-        .json()
-        .then((data) => {
+    req.method = "GET";
+
+    fetch(
+      "https://europe-west3-nof-app-dev.cloudfunctions.net/app/userhistory",
+      req
+    )
+      .then((res) => {
+        res.json().then((data) => {
           data.meetings.forEach((meeting) => {
             meeting.type = "meeting";
             meeting.date = new Date(meeting.date._seconds * 1000);
@@ -61,31 +65,44 @@ export function UserProvider({ children }) {
           history.sort((a, b) => b.date - a.date);
 
           setUserHistory(history);
-        })
-        .catch((err) => console.log(err));
-    });
+        });
+      })
+      .catch((err) => {
+        console.log("faild to get user info");
+      });
   }
 
   async function RegisterMeeting(meeting) {
     const httpReq = await GetHttpReq();
     httpReq.method = "PUT";
-    return fetch(`/meetings/register/${meeting.id}`, httpReq);
+    return fetch(
+      `https://europe-west3-nof-app-dev.cloudfunctions.net/app/meetings/register/${meeting.id}`,
+      httpReq
+    );
   }
 
   async function UnregisterFromMeeting(meeting) {
     const httpReq = await GetHttpReq();
     httpReq.method = "PUT";
-    return fetch(`/meetings/deregister/${meeting.id}`, httpReq);
+    return fetch(
+      `https://europe-west3-nof-app-dev.cloudfunctions.net/app/meetings/deregister/${meeting.id}`,
+      httpReq
+    );
   }
 
+  // On component mount
   useEffect(() => {
     if (currentUser) {
       GetUserInfo();
     }
+  }, []);
+
+  // On meetings change
+  useEffect(() => {
     if (meetings) {
       setRegistered(FindUserRegisteredMeetings(meetings));
     }
-  }, [currentUser]);
+  }, [meetings]);
 
   const value = {
     registered,
