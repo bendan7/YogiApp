@@ -9,7 +9,7 @@ export default function MeetingModal({ meeting, ...props }) {
   const [isEditMode, setIsEditMode] = useState();
   const [errorMsg, setErrorMsg] = useState();
 
-  const { NewMeeting, DeleteMeeting, UpdateMeeting } = useMeetingsContext();
+  const { CreateMeeting, DeleteMeeting, UpdateMeeting } = useMeetingsContext();
   const handleClose = props.handleClose;
 
   const [date, setDate] = useState();
@@ -73,7 +73,7 @@ export default function MeetingModal({ meeting, ...props }) {
 
     const newMeeting = GetMeetingObjFromFields();
 
-    NewMeeting(newMeeting)
+    CreateMeeting(newMeeting)
       .then(() => {
         handleClose();
       })
@@ -245,6 +245,7 @@ export default function MeetingModal({ meeting, ...props }) {
             ref={descriptionRef}
             type="text"
           />
+          <h5>:רשומים</h5>
           <PrticipatesList
             participates={meeting?.participates}
             editable={isEditMode}
@@ -258,9 +259,9 @@ export default function MeetingModal({ meeting, ...props }) {
 }
 
 function PrticipatesList({ participates, editable, onDelete }) {
-  return participates && participates.length > 0 ? (
+  return (
     <>
-      <h5>:רשומים</h5>
+      <Button>הוסף משתתף</Button>
       <ListGroup className="p-0 m-0">
         {participates.map((par) => (
           <ListGroup.Item key={par.uid} variant="secondary" className="p-1">
@@ -280,5 +281,5 @@ function PrticipatesList({ participates, editable, onDelete }) {
         ))}
       </ListGroup>
     </>
-  ) : null;
+  );
 }

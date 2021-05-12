@@ -174,6 +174,10 @@ app.post("/meetings", async (req, res) => {
     });
 });
 
+app.get("/users", async (req, res) => {
+  console.log("userss");
+});
+
 exports.app = functions.region("europe-west3").https.onRequest(app);
 
 function CreateNewAdmin(change, context) {

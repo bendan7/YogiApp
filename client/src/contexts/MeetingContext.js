@@ -42,17 +42,13 @@ export function MeetingProvider({ children }) {
       });
   }
 
-  //protected by security rules. Only admin can add new meeting
-  async function NewMeeting(meeting) {
+  //those functions are protected by security rules. Only admin can add new meeting
+  async function CreateMeeting(meeting) {
     return firestore.collection("upcoming").add(meeting);
   }
-
-  //protected by security rules. Only admin can add new meeting
   function DeleteMeeting(meetingId) {
     return firestore.collection("upcoming").doc(meetingId).delete();
   }
-
-  //protected by security rules. Only admin can add new meeting
   function UpdateMeeting(meetingId, meeting) {
     return firestore.collection("upcoming").doc(meetingId).update(meeting);
   }
@@ -65,7 +61,7 @@ export function MeetingProvider({ children }) {
 
   const value = {
     meetings,
-    NewMeeting,
+    CreateMeeting,
     DeleteMeeting,
     UpdateMeeting,
   };
