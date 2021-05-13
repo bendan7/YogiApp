@@ -41,7 +41,7 @@ export function UserProvider({ children }) {
     req.method = "GET";
 
     fetch(
-      "https://europe-west3-nof-app-dev.cloudfunctions.net/app/userhistory",
+      "/api/userhistory",
       req
     )
       .then((res) => {
@@ -76,7 +76,7 @@ export function UserProvider({ children }) {
     const httpReq = await GetHttpReq();
     httpReq.method = "PUT";
     return fetch(
-      `https://europe-west3-nof-app-dev.cloudfunctions.net/app/meetings/register/${meeting.id}`,
+      `/api/meetings/register/${meeting.id}`,
       httpReq
     );
   }
@@ -85,7 +85,7 @@ export function UserProvider({ children }) {
     const httpReq = await GetHttpReq();
     httpReq.method = "PUT";
     return fetch(
-      `https://europe-west3-nof-app-dev.cloudfunctions.net/app/meetings/deregister/${meeting.id}`,
+      `/api/meetings/deregister/${meeting.id}`,
       httpReq
     );
   }
