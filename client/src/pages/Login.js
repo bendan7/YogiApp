@@ -71,8 +71,22 @@ export default function Login() {
                     </div>
                     <div className="m-4 p-2 border bg-warning">
                         <h3>Demo Credentials</h3>
-                        <div>User: nofar@gmail.com Pass: 123456</div>
-                        <div>Admin: bendan7@gmail.com Pass: 123456</div>
+                        <div className="text-left">
+                            <div>
+                                <b>User: </b>nofar@gmail.com
+                            </div>
+                            <div>
+                                <b>Pass: 123456</b>
+                            </div>
+                        </div>
+                        <div className="text-left mt-4">
+                            <div>
+                                <b>Admin: </b>bendan7@gmail.com
+                            </div>
+                            <div>
+                                <b>Pass: 123456</b>
+                            </div>
+                        </div>
                     </div>
 
                     {error && (
