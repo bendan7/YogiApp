@@ -10,34 +10,26 @@ export default function Meetings() {
 
     // modal
     const [selectedMeetingIndex, setSelectedMeetingIndex] = useState()
-    const [show, setShow] = useState(false)
-    const handleClose = () => setShow(false)
+    const [showModal, setShowModal] = useState(false)
+    const handleClose = () => setShowModal(false)
 
     const handleShow = (meetingIndex) => {
         setSelectedMeetingIndex(meetingIndex)
-        setShow(true)
+        setShowModal(true)
     }
 
     return (
         <div>
-            <Link to="/admin">
-                <Button onClick={() => handleShow(null)} block>
-                    תפריט ראשי
-                </Button>
-            </Link>
-
-            <h1 className="mt-4 text-center font-weight-bold">מפגשים</h1>
-
-            <h3 className="mt-0 text-right font-weight-bold">מפגשים קרובים</h3>
+            <h1 className="mt-3 text-center font-weight-bold">מפגשים קרובים</h1>
             <Button
-                variant="success mb-2"
+                variant="success mb-3"
                 onClick={() => handleShow(null)}
                 block
             >
                 הוסף מפגש
             </Button>
             <MeetingModal
-                show={show}
+                show={showModal}
                 handleClose={handleClose}
                 meeting={
                     selectedMeetingIndex != null

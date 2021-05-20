@@ -20,7 +20,7 @@ export default function AdminDashboard() {
 
             <Link to="/participants">
                 <Button className="mb-2" size="lg" block>
-                    תלמידים
+                    משתתפים
                 </Button>
             </Link>
 

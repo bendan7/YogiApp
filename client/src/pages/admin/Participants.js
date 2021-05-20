@@ -1,14 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { Button, ListGroup, InputGroup, FormControl } from 'react-bootstrap'
+import ParticipantModal from '../../components/Admin/ParticipantModal'
 
 export default function Participants() {
-    const [participants, setParticipants] = useState([])
-    const [filterdParticipants, setFilterdParticipants] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
-
-    const searchRef = useRef()
+    const searchStrRef = useRef()
     const { GetHttpReq } = useAuth()
+
+    const [showModal, setShowModal] = useState(false)
+    const handleClose = () => setShowModal(false)
+
+    const [allParticipants, setAllParticipants] = useState([])
+    const [filterdParticipants, setFilterdParticipants] = useState([])
+    const [selectedPar, setSelectedPar] = useState()
+    const [isLoading, setIsLoading] = useState(true)
 
     async function GetAllUsers() {
         const req = await GetHttpReq()
@@ -17,11 +22,9 @@ export default function Participants() {
             .then((res) => res.json())
             .then(
                 (result) => {
-                    setParticipants(result)
+                    setAllParticipants(result)
                     setFilterdParticipants(result)
                     setIsLoading(false)
-                    console.log(result)
-                    GetUserInfo(result[1].uid)
                 },
                 (error) => {
                     console.log(error)
@@ -29,19 +32,9 @@ export default function Participants() {
             )
     }
 
-    async function GetUserInfo(uid) {
-        const req = await GetHttpReq()
-        req.method = 'GET'
-        fetch(`${process.env.REACT_APP_BASE_URL}/api/userinfo/${uid}`, req)
-            .then((res) => res.json())
-            .then(
-                (result) => {
-                    console.log(result)
-                },
-                (error) => {
-                    console.log(error)
-                }
-            )
+    function selecteParticipant(participant) {
+        setSelectedPar(participant)
+        setShowModal(true)
     }
 
     useEffect(() => {
@@ -49,7 +42,7 @@ export default function Participants() {
     }, [])
 
     function Search(term) {
-        const filterList = participants.filter(
+        const filterList = allParticipants.filter(
             (par) => par.displayName.includes(term) || par.email.includes(term)
         )
         setFilterdParticipants(filterList)
@@ -63,14 +56,17 @@ export default function Participants() {
                 <FormControl
                     aria-label="Amount (to the nearest dollar)"
                     required
-                    ref={searchRef}
-                    onChange={() => Search(searchRef.current.value)}
+                    ref={searchStrRef}
+                    onChange={() => Search(searchStrRef.current.value)}
                     type="text"
                 />
                 <InputGroup.Append>
                     <InputGroup.Text>חיפוש</InputGroup.Text>
                 </InputGroup.Append>
             </InputGroup>
+            <h5>
+                {filterdParticipants.length}/{allParticipants.length}
+            </h5>
 
             <ListGroup className="p-0 m-0">
                 {filterdParticipants?.map((participant, index) => {
@@ -84,7 +80,13 @@ export default function Participants() {
                                 <div className="mr-2">
                                     {participant.displayName}
                                 </div>
-                                <Button variant="info" size="sm">
+                                <Button
+                                    variant="info"
+                                    size="sm"
+                                    onClick={() =>
+                                        selecteParticipant(participant)
+                                    }
+                                >
                                     +
                                 </Button>
                             </div>
@@ -92,6 +94,11 @@ export default function Participants() {
                     )
                 })}
             </ListGroup>
+            <ParticipantModal
+                show={showModal}
+                handleClose={handleClose}
+                participant={selectedPar}
+            />
         </div>
     )
 }
