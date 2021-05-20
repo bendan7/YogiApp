@@ -159,29 +159,6 @@ app.put('/meetings/deregister/:meetingId/', async (req, res) => {
 })
 
 // --------- Admin apis ---------
-// Add new meeting
-app.post('/meetings', async (req, res) => {
-    if (req.user.isAdmin != true) {
-        return res.status(403).send('Unauthorized')
-    }
-
-    // convert date type to timestamp
-    const timestamp = admin.firestore.Timestamp.fromDate(
-        new Date(req.body.datetime)
-    )
-    req.body.datetime = timestamp
-
-    await db
-        .collection('upcoming')
-        .add(req.body)
-        .then(() => {
-            res.status(201).send()
-        })
-        .catch((err) => {
-            console.error(err)
-            res.status(500).send()
-        })
-})
 
 // Get list of all users
 app.get('/users', async (req, res) => {
