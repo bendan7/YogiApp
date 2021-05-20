@@ -198,7 +198,11 @@ app.get('/users', async (req, res) => {
                 }
             })
             .then(() => {
-                res.status(200).send(allUsers)
+                const withoutAdmins = allUsers.filter(
+                    (user) => !(user.customClaims && user.customClaims.isAdmin)
+                )
+
+                res.status(200).send(withoutAdmins)
             })
             .catch((error) => {
                 console.log('Error listing users:', error)
