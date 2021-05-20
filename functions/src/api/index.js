@@ -66,11 +66,18 @@ app.use(cookieParser)
 app.use(express.json())
 app.use(validateFirebaseIdToken)
 
-// --------- Users Api ---------
-app.get('/userhistory', async (req, res) => {
+// --------- Common Api ---------
+app.get('/userinfo/:uid?', async (req, res) => {
+    let uid = req.user.uid
+
+    // Admin can get info of all users
+    if (req.params.uid && req.user.isAdmin) {
+        uid = req.params.uid
+    }
+
     const userMeetings = await db
         .collection('meetings')
-        .where('participants', 'array-contains', req.user.uid)
+        .where('participants', 'array-contains', uid)
         .get()
         .then((querySnapshot) => {
             return querySnapshot.docs.map((doc) => doc.data())
@@ -81,7 +88,7 @@ app.get('/userhistory', async (req, res) => {
 
     const userTickts = await db
         .collection('tickts')
-        .where('uid', '==', req.user.uid)
+        .where('uid', '==', uid)
         .get()
         .then((querySnapshot) => {
             return querySnapshot.docs.map((doc) => doc.data())
@@ -90,14 +97,23 @@ app.get('/userhistory', async (req, res) => {
             res.status(500).send(err)
         })
 
+    let totalPurchasedEntries = 0
+    userTickts.forEach((tickt) => {
+        totalPurchasedEntries += tickt.num_of_entries
+    })
+
+    const remainsEntries = totalPurchasedEntries - userMeetings.length
+
     const userHistory = {
         meetings: userMeetings,
         tickts: userTickts,
+        remainsEntries: remainsEntries,
     }
 
     res.json(userHistory)
 })
 
+// --------- Users Api ---------
 app.put('/meetings/register/:meetingId', async (req, res) => {
     const meetingId = req.params.meetingId
     const uid = req.user.uid
@@ -130,7 +146,6 @@ app.put('/meetings/register/:meetingId', async (req, res) => {
             res.status(404).send('Meeting ID Not Found')
         })
 })
-
 app.put('/meetings/deregister/:meetingId/', async (req, res) => {
     const meetingId = req.params.meetingId
 
@@ -159,11 +174,39 @@ app.put('/meetings/deregister/:meetingId/', async (req, res) => {
 })
 
 // --------- Admin apis ---------
-
 // Get list of all users
 app.get('/users', async (req, res) => {
-    res.send('true')
-    console.log('/userssss')
+    if (req.user.isAdmin != true) {
+        res.status(403).send('Unauthorized')
+        return
+    }
+
+    const getAllUsers = (nextPageToken) => {
+        // List batch of users, 1000 at a time.
+        const allUsers = []
+
+        admin
+            .auth()
+            .listUsers(1000, nextPageToken)
+            .then((listUsersResult) => {
+                listUsersResult.users.forEach((userRecord) => {
+                    allUsers.push(userRecord.toJSON())
+                })
+                if (listUsersResult.pageToken) {
+                    // List next batch of users.
+                    getAllUsers(listUsersResult.pageToken)
+                }
+            })
+            .then(() => {
+                res.status(200).send(allUsers)
+            })
+            .catch((error) => {
+                console.log('Error listing users:', error)
+            })
+    }
+
+    // Start listing users from the beginning, 1000 at a time.
+    getAllUsers()
 })
 
 module.exports = app

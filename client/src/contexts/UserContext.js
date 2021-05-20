@@ -40,7 +40,7 @@ export function UserProvider({ children }) {
         const req = await GetHttpReq()
         req.method = 'GET'
 
-        fetch(`${process.env.REACT_APP_BASE_URL}/api/userhistory`, req)
+        fetch(`${process.env.REACT_APP_BASE_URL}/api/userinfo`, req)
             .then((res) => {
                 res.json()
                     .then((data) => {
@@ -51,21 +51,16 @@ export function UserProvider({ children }) {
                             )
                         })
 
-                        let totalPurchasedEntries = 0
                         data.tickts.forEach((tickt) => {
                             tickt.type = 'tickt'
-                            totalPurchasedEntries += tickt.num_of_entries
                             tickt.date = new Date(tickt.date?._seconds * 1000)
                         })
-
-                        const validEntries =
-                            totalPurchasedEntries - data.meetings.length
-                        setUserEntries(validEntries)
 
                         const history = data.meetings.concat(data.tickts)
                         history.sort((a, b) => b.date - a.date)
 
                         setUserHistory(history)
+                        setUserEntries(data.remainsEntries)
                     })
                     .catch((err) => {
                         console.log(err)

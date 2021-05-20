@@ -1,57 +1,77 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState } from 'react'
 import { Form, Button, Card, Alert } from 'react-bootstrap'
+import { useAuth } from '../../contexts/AuthContext'
 import { Link, useHistory } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
 
-export default function Login() {
+export default function Signup() {
     const emailRef = useRef()
+    const nameRef = useRef()
     const passwordRef = useRef()
-    const { login, currentUser } = useAuth()
+    const passwordConfRef = useRef()
+    const { signup } = useAuth()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState()
     const history = useHistory()
 
-    useEffect(() => {
-        if (currentUser) {
-            history.push('/')
-        }
-    })
-
     async function handleSubmit(e) {
         e.preventDefault()
+
+        if (passwordRef.current.value !== passwordConfRef.current.value) {
+            return setError('הסיסמאות אינן תואומות')
+        }
+
+        if (!nameRef.current.value) {
+            return setError('שם מלא לא חוקי')
+        }
 
         try {
             setError('')
             setLoading(true)
-            await login(emailRef.current.value, passwordRef.current.value)
+            await signup(
+                emailRef.current.value,
+                passwordRef.current.value,
+                nameRef.current.value
+            )
         } catch (e) {
             setError(`${e?.message} `)
-        } finally {
             setLoading(false)
+            return
         }
+
+        history.push('/')
     }
 
     return (
         <>
             <Card>
                 <Card.Body className="text-center">
-                    <h2>התחברות</h2>
+                    <h2>משתמש חדש</h2>
                     <Form onSubmit={handleSubmit} className="text-right">
-                        <Form.Group>
+                        <Form.Group id="email">
                             <Form.Label>דואר אלקטרוני</Form.Label>
                             <Form.Control
-                                id="email"
                                 type="email"
                                 ref={emailRef}
                                 required
                             />
                         </Form.Group>
-                        <Form.Group>
+                        <Form.Group id="name">
+                            <Form.Label>שם מלא</Form.Label>
+                            <Form.Control type="name" ref={nameRef} required />
+                        </Form.Group>
+                        <Form.Group id="password">
                             <Form.Label>סיסמא</Form.Label>
                             <Form.Control
-                                id="password"
                                 type="password"
                                 ref={passwordRef}
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group id="password-confirm">
+                            <Form.Label>אימות סיסמא</Form.Label>
+                            <Form.Control
+                                type="password"
+                                ref={passwordConfRef}
                                 required
                             />
                         </Form.Group>
@@ -60,35 +80,9 @@ export default function Login() {
                             className="w-100 "
                             type="submit"
                         >
-                            התחברות
+                            Sign Up
                         </Button>
                     </Form>
-                    <div className="w-100 text-center mt-3">
-                        <Link to="forgot-password">? שכחת סיסמה</Link>
-                    </div>
-                    <div className="w-100 text-center mt-2">
-                        אין לך חשבון? <Link to="/signup">צור חשבון חדש</Link>
-                    </div>
-                    <div className="m-4 p-2 border bg-warning">
-                        <h3>Demo Credentials</h3>
-                        <div className="text-left">
-                            <div>
-                                <b>User: </b>nofar@gmail.com
-                            </div>
-                            <div>
-                                <b>Pass: 123456</b>
-                            </div>
-                        </div>
-                        <div className="text-left mt-4">
-                            <div>
-                                <b>Admin: </b>bendan7@gmail.com
-                            </div>
-                            <div>
-                                <b>Pass: 123456</b>
-                            </div>
-                        </div>
-                    </div>
-
                     {error && (
                         <Alert
                             className=" mt-3 mb-0 text-center"
@@ -99,6 +93,9 @@ export default function Login() {
                     )}
                 </Card.Body>
             </Card>
+            <div className="w-100 text-center mt-2">
+                יש לך כבר חשבון? <Link to="/login">כניסה למשתמש קיים</Link>
+            </div>
         </>
     )
 }

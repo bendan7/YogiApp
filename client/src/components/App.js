@@ -1,16 +1,17 @@
 import React from 'react'
-import Signup from '../pages/Signup'
-import UserDashboard from '../pages/UserDashboard'
-import Login from '../pages/Login'
+import Signup from '../pages/user/Signup'
+import UserDashboard from '../pages/user/UserDashboard'
+import Login from '../pages/common/Login'
 import { AuthProvider } from '../contexts/AuthContext'
 import { MeetingProvider } from '../contexts/MeetingContext'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute'
-import ForgotPassword from '../pages/ForgotPassword'
-import UpdateProfile from '../pages/UpdateProfile'
+import ForgotPassword from '../pages/common/ForgotPassword'
+import UpdateProfile from '../pages/common/UpdateProfile'
 import PrivateAdminRoute from './PrivateAdminRoute'
 import AdminDashboard from '../pages/admin/AdminDashboard'
 import Meetings from '../pages/admin/Meetings'
+import Participants from '../pages/admin/Participants'
 
 export default function App() {
     const centerImg = {
@@ -60,6 +61,10 @@ export default function App() {
                                 <PrivateAdminRoute
                                     path="/admin"
                                     component={AdminDashboard}
+                                />
+                                <PrivateAdminRoute
+                                    path="/participants"
+                                    component={Participants}
                                 />
                                 <PrivateAdminRoute
                                     path="/meetings"
