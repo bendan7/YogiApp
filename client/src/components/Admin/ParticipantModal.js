@@ -1,12 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Button, ListGroup, Modal, Form, Alert } from 'react-bootstrap'
+import { Button, ListGroup, Modal, Form, Alert, Spinner } from 'react-bootstrap'
 import 'react-datepicker/dist/react-datepicker.css'
 import DatePicker from 'react-datepicker'
 import { useMeetingsContext } from '../../contexts/MeetingContext'
 import { useAuth } from '../../contexts/AuthContext'
+import { useUserContext } from '../../contexts/UserContext'
+import UserHistoryList from '../User/UserHistoryList'
 
 export default function ParticipantModal({ show, handleClose, participant }) {
     const { GetHttpReq } = useAuth()
+    const [userInfo, setUserInfo] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
     async function GetUserInfo(uid) {
         const req = await GetHttpReq()
@@ -16,7 +20,7 @@ export default function ParticipantModal({ show, handleClose, participant }) {
             .then(
                 (result) => {
                     setUserInfo(result)
-                    console.log(result)
+                    setIsLoading(false)
                 },
                 (error) => {
                     console.log(error)
@@ -24,10 +28,9 @@ export default function ParticipantModal({ show, handleClose, participant }) {
             )
     }
 
-    const [userInfo, setUserInfo] = useState()
-
     useEffect(() => {
         if (participant) {
+            setIsLoading(true)
             GetUserInfo(participant.uid)
         }
     }, [participant])
@@ -40,9 +43,23 @@ export default function ParticipantModal({ show, handleClose, participant }) {
             show={show}
             onHide={handleClose}
         >
-            <Modal.Header closeButton>{participant?.displayName}</Modal.Header>
+            <Modal.Header closeButton>
+                <h3>{participant?.displayName}</h3>
+            </Modal.Header>
             <Modal.Body>
-                <h5>{participant?.displayName}</h5>
+                {isLoading ? (
+                    <div className="mt-3 d-flex justify-content-center">
+                        <Spinner animation="border" variant="primary" />
+                    </div>
+                ) : (
+                    <div>
+                        <h5>מספר כניסות בכרטיסיה: {userInfo.remainsEntries}</h5>
+                        <UserHistoryList
+                            historyList={userInfo.history}
+                            maxInfoEntries={1000}
+                        />
+                    </div>
+                )}
             </Modal.Body>
             <Modal.Footer>fotter</Modal.Footer>
         </Modal>

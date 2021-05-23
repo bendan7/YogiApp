@@ -8,19 +8,24 @@ export default function UpdateProfile() {
     const oldPassRef = useRef()
     const passwordRef = useRef()
     const passwordConfRef = useRef()
+    const displayNameRef = useRef()
 
-    const { updateUserPassword, login, currentUser } = useAuth()
+    const { updateUserPassword, login, currentUser, updateUserDisplayName } =
+        useAuth()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState()
     const [msg, setMsg] = useState()
 
-    async function handleSubmit(e) {
-        e.preventDefault()
+    function updateDisplayName() {
+        setError('')
+        setLoading(true)
+        updateUserDisplayName(displayNameRef.current.value).then(() => {
+            setLoading(false)
+            setMsg('הפרטים עודכנו בהצלחה')
+        })
+    }
 
-        if (passwordRef.current.value !== passwordConfRef.current.value) {
-            return setError('הסיסמאות אינן תואומות')
-        }
-
+    async function updatePassword() {
         try {
             setError('')
             setLoading(true)
@@ -36,6 +41,20 @@ export default function UpdateProfile() {
             setError(`${e?.message} `)
         } finally {
             setLoading(false)
+        }
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault()
+
+        if (passwordRef.current.value !== passwordConfRef.current.value) {
+            return setError('הסיסמאות אינן תואומות')
+        }
+
+        if (passwordRef.current.value === '') {
+            updateDisplayName()
+        } else {
+            updatePassword()
         }
     }
 
@@ -67,6 +86,16 @@ export default function UpdateProfile() {
                             />
                         </Form.Group>
                         <Form.Group>
+                            <Form.Label>שם מלא</Form.Label>
+                            <Form.Control
+                                id="displayName"
+                                type="text"
+                                ref={displayNameRef}
+                                required
+                                defaultValue={currentUser.displayName}
+                            />
+                        </Form.Group>
+                        <Form.Group>
                             <Form.Label> סיסמה נוכחית</Form.Label>
                             <Form.Control
                                 id="old-password"
@@ -82,7 +111,6 @@ export default function UpdateProfile() {
                                 id="new-password"
                                 type="password"
                                 ref={passwordRef}
-                                required
                             />
                         </Form.Group>
                         <Form.Group>
@@ -91,22 +119,22 @@ export default function UpdateProfile() {
                                 id="new-password-conf"
                                 type="password"
                                 ref={passwordConfRef}
-                                required
                             />
                         </Form.Group>
                         <Button
                             disabled={loading}
-                            className="w-100 "
+                            className="w-100 mb-2"
                             type="submit"
                         >
                             עדכן
                         </Button>
+                        <Link to="/">
+                            <Button className="w-100 ">חזור</Button>
+                        </Link>
                     </Form>
                 </Card.Body>
             </Card>
-            <div className="w-100 text-center mt-2">
-                <Link to="/">חזור</Link>
-            </div>
+            <div className="w-100 text-center mt-2"></div>
         </>
     )
 }

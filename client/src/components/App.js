@@ -12,6 +12,7 @@ import PrivateAdminRoute from './PrivateAdminRoute'
 import AdminDashboard from '../pages/admin/AdminDashboard'
 import Meetings from '../pages/admin/Meetings'
 import Participants from '../pages/admin/Participants'
+import { UserProvider } from '../contexts/UserContext'
 
 export default function App() {
     const centerImg = {
@@ -41,36 +42,38 @@ export default function App() {
                     <h3 className="text-center">מערכת ניהול כרטיסיות</h3>
                     <AuthProvider>
                         <MeetingProvider>
-                            <Switch>
-                                <Route path="/signup" component={Signup} />
-                                <Route path="/login" component={Login} />
-                                <Route
-                                    path="/forgot-password"
-                                    component={ForgotPassword}
-                                />
-                                <Route
-                                    path="/update-profile"
-                                    component={UpdateProfile}
-                                />
+                            <UserProvider>
+                                <Switch>
+                                    <Route path="/signup" component={Signup} />
+                                    <Route path="/login" component={Login} />
+                                    <Route
+                                        path="/forgot-password"
+                                        component={ForgotPassword}
+                                    />
+                                    <Route
+                                        path="/update-profile"
+                                        component={UpdateProfile}
+                                    />
 
-                                <PrivateRoute
-                                    exact
-                                    path="/"
-                                    component={UserDashboard}
-                                />
-                                <PrivateAdminRoute
-                                    path="/admin"
-                                    component={AdminDashboard}
-                                />
-                                <PrivateAdminRoute
-                                    path="/participants"
-                                    component={Participants}
-                                />
-                                <PrivateAdminRoute
-                                    path="/meetings"
-                                    component={Meetings}
-                                />
-                            </Switch>
+                                    <PrivateRoute
+                                        exact
+                                        path="/"
+                                        component={UserDashboard}
+                                    />
+                                    <PrivateAdminRoute
+                                        path="/admin"
+                                        component={AdminDashboard}
+                                    />
+                                    <PrivateAdminRoute
+                                        path="/participants"
+                                        component={Participants}
+                                    />
+                                    <PrivateAdminRoute
+                                        path="/meetings"
+                                        component={Meetings}
+                                    />
+                                </Switch>
+                            </UserProvider>
                         </MeetingProvider>
                     </AuthProvider>
                 </Router>

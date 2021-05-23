@@ -44,22 +44,7 @@ export function UserProvider({ children }) {
             .then((res) => {
                 res.json()
                     .then((data) => {
-                        data.meetings.forEach((meeting) => {
-                            meeting.type = 'meeting'
-                            meeting.date = new Date(
-                                meeting.date._seconds * 1000
-                            )
-                        })
-
-                        data.tickts.forEach((tickt) => {
-                            tickt.type = 'tickt'
-                            tickt.date = new Date(tickt.date?._seconds * 1000)
-                        })
-
-                        const history = data.meetings.concat(data.tickts)
-                        history.sort((a, b) => b.date - a.date)
-
-                        setUserHistory(history)
+                        setUserHistory(data.history)
                         setUserEntries(data.remainsEntries)
                     })
                     .catch((err) => {

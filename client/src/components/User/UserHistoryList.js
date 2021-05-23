@@ -2,17 +2,19 @@ import React from 'react'
 import { ListGroup } from 'react-bootstrap'
 import { useUserContext } from '../../contexts/UserContext'
 
-export default function UserHistoryList(props) {
-    const { userHistory } = useUserContext()
-
+export default function UserHistoryList({ historyList, maxInfoEntries }) {
     function HistoryEntry(props) {
+        const date = new Date(props.date?._seconds * 1000)
         const type = props.type === 'meeting' ? 'שיעור' : 'כרטיסיה'
-        const text =
-            props.type === 'meeting'
-                ? `${props.title}-${props.location}`
-                : `מספר כניסות: ${props.num_of_entries}`
 
-        const dateStr = `${props.date?.getDate()}/${props.date?.getMonth() + 1}`
+        let text
+        if (props.type === 'meeting') {
+            text = `${props.title}-${props.location}`
+        } else {
+            text = `מספר כניסות: ${props.num_of_entries}`
+        }
+
+        const dateStr = `${date?.getDate()}/${date?.getMonth() + 1}`
 
         let variant = props.type === 'meeting' ? 'info' : 'success'
 
@@ -30,9 +32,9 @@ export default function UserHistoryList(props) {
     }
 
     return (
-        <ListGroup className="p-0 m-0">
-            {userHistory?.map((entry, index) =>
-                index < props.maxInfoEntries ? (
+        <ListGroup className="p-0 m-0 text-center">
+            {historyList?.map((entry, index) =>
+                index < maxInfoEntries ? (
                     <HistoryEntry key={index} {...entry} />
                 ) : null
             )}

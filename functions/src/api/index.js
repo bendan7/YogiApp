@@ -69,10 +69,12 @@ app.use(validateFirebaseIdToken)
 // --------- Common Api ---------
 app.get('/userinfo/:uid?', async (req, res) => {
     let uid = req.user.uid
+    let user = req.user
 
-    // Admin can get info of all users
+    // Admin can access to all users info
     if (req.params.uid && req.user.isAdmin) {
         uid = req.params.uid
+        user = await admin.auth().getUser(uid)
     }
 
     const userMeetings = await db
@@ -97,20 +99,31 @@ app.get('/userinfo/:uid?', async (req, res) => {
             res.status(500).send(err)
         })
 
+    userMeetings.forEach((meeting) => {
+        meeting.type = 'meeting'
+    })
+
+    userTickts.forEach((tickt) => {
+        tickt.type = 'tickt'
+    })
+
+    const history = userMeetings.concat(userTickts)
+    history.sort((a, b) => b.date - a.date)
+
+    // Calc remains entries for user
     let totalPurchasedEntries = 0
     userTickts.forEach((tickt) => {
         totalPurchasedEntries += tickt.num_of_entries
     })
-
     const remainsEntries = totalPurchasedEntries - userMeetings.length
 
     const userHistory = {
-        meetings: userMeetings,
-        tickts: userTickts,
+        user: user,
+        history: history,
         remainsEntries: remainsEntries,
     }
 
-    res.json(userHistory)
+    res.status(200).json(userHistory)
 })
 
 // --------- Users Api ---------

@@ -20,7 +20,7 @@ export default function Meetings() {
 
     return (
         <div>
-            <h1 className="mt-3 text-center font-weight-bold">מפגשים קרובים</h1>
+            <h1 className="mt-3 text-right font-weight-bold">:מפגשים קרובים</h1>
             <Button
                 variant="success mb-3"
                 onClick={() => handleShow(null)}
@@ -54,7 +54,7 @@ export default function Meetings() {
                                     </div>
                                     <div>{meeting.date}</div>
                                 </div>
-                                <div className="w-100 pr-2 pl-2 text-right">
+                                <div className="w-100 pr-2 pl-2 text-center">
                                     {meeting.name}-{meeting.location}
                                 </div>
                                 <Button

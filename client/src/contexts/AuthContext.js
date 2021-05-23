@@ -1,94 +1,101 @@
-import React, { useContext, useEffect, useState } from "react";
-import { auth } from "../firebase";
+import React, { useContext, useEffect, useState } from 'react'
+import { auth } from '../firebase'
 
-const AuthContext = React.createContext();
+const AuthContext = React.createContext()
 
 export function useAuth() {
-  return useContext(AuthContext);
+    return useContext(AuthContext)
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState();
-  const [loading, setLoading] = useState(true);
+    const [currentUser, setCurrentUser] = useState()
+    const [loading, setLoading] = useState(true)
 
-  function signup(email, password, userName) {
-    return auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCardi) => {
-        const user = auth.currentUser;
-        user.updateProfile({ displayName: userName });
-      });
-  }
-
-  function login(email, password) {
-    return auth.signInWithEmailAndPassword(email, password);
-  }
-
-  function logout() {
-    return auth.signOut();
-  }
-
-  function resetPassword(email) {
-    return auth.sendPasswordResetEmail(email);
-  }
-
-  function updateUserPassword(password) {
-    return currentUser.updatePassword(password);
-  }
-
-  async function GetHttpReq() {
-    if (currentUser == null) {
-      return;
+    function signup(email, password, userName) {
+        return auth
+            .createUserWithEmailAndPassword(email, password)
+            .then((userCardi) => {
+                const user = auth.currentUser
+                user.updateProfile({ displayName: userName })
+            })
     }
 
-    var accessToken = null;
-    await currentUser.getIdToken().then(function (token) {
-      accessToken = token;
-    });
+    function login(email, password) {
+        return auth.signInWithEmailAndPassword(email, password)
+    }
 
-    const req = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        cache: "no-cache",
-      },
-    };
-    return req;
-  }
+    function logout() {
+        return auth.signOut()
+    }
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        user.getIdTokenResult().then((tokenResult) => {
-          if (tokenResult.claims.isAdmin) {
-            user.isAdmin = true;
-          }
-          setCurrentUser(user);
-          setLoading(false);
-        });
-      } else {
-        setCurrentUser(user);
-        setLoading(false);
-      }
-    });
+    function resetPassword(email) {
+        return auth.sendPasswordResetEmail(email)
+    }
 
-    return unsubscribe;
-  }, []);
+    function updateUserPassword(password) {
+        return currentUser.updatePassword(password)
+    }
 
-  const value = {
-    currentUser,
-    login,
-    logout,
-    signup,
-    resetPassword,
-    updateUserPassword,
-    GetHttpReq,
-  };
+    function updateUserDisplayName(newName) {
+        return currentUser.updateProfile({
+            displayName: newName,
+        })
+    }
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading ? children : null}
-    </AuthContext.Provider>
-  );
+    async function GetHttpReq() {
+        if (currentUser == null) {
+            return
+        }
+
+        var accessToken = null
+        await currentUser.getIdToken().then(function (token) {
+            accessToken = token
+        })
+
+        const req = {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                cache: 'no-cache',
+            },
+        }
+        return req
+    }
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                user.getIdTokenResult().then((tokenResult) => {
+                    if (tokenResult.claims.isAdmin) {
+                        user.isAdmin = true
+                    }
+                    setCurrentUser(user)
+                    setLoading(false)
+                })
+            } else {
+                setCurrentUser(user)
+                setLoading(false)
+            }
+        })
+
+        return unsubscribe
+    }, [])
+
+    const value = {
+        currentUser,
+        login,
+        logout,
+        signup,
+        resetPassword,
+        updateUserPassword,
+        GetHttpReq,
+        updateUserDisplayName,
+    }
+
+    return (
+        <AuthContext.Provider value={value}>
+            {!loading ? children : null}
+        </AuthContext.Provider>
+    )
 }
