@@ -50,7 +50,7 @@ export default function Participants() {
 
     return (
         <div>
-            <h2 className="mt-4 text-center font-weight-bold">משתתפים</h2>
+            <h1 className="mt-5 text-center">משתתפים</h1>
 
             <InputGroup className="mb-3 text-right">
                 <FormControl

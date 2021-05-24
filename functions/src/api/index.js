@@ -82,7 +82,11 @@ app.get('/userinfo/:uid?', async (req, res) => {
         .where('participants', 'array-contains', uid)
         .get()
         .then((querySnapshot) => {
-            return querySnapshot.docs.map((doc) => doc.data())
+            return querySnapshot.docs.map((doc) => {
+                const data = doc.data()
+                data.docId = doc.id
+                return data
+            })
         })
         .catch((err) => {
             res.status(500).send(err)
@@ -93,7 +97,11 @@ app.get('/userinfo/:uid?', async (req, res) => {
         .where('uid', '==', uid)
         .get()
         .then((querySnapshot) => {
-            return querySnapshot.docs.map((doc) => doc.data())
+            return querySnapshot.docs.map((doc) => {
+                const data = doc.data()
+                data.docId = doc.id
+                return data
+            })
         })
         .catch((err) => {
             res.status(500).send(err)

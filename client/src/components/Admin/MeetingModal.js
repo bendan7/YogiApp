@@ -153,14 +153,14 @@ export default function MeetingModal({ meeting, ...props }) {
             //Edit mode of existing meeting
             return (
                 <Button variant="danger" size="sm" onClick={OnDeleteMeeting}>
-                    Delete/Cancel
+                    מחק מפגש
                 </Button>
             )
         } else {
             //View mode of existing meeting
             return (
                 <Button variant="warning" onClick={() => setIsEditMode(true)}>
-                    EDIT
+                    ערוך מפגש
                 </Button>
             )
         }
@@ -200,8 +200,8 @@ export default function MeetingModal({ meeting, ...props }) {
                         type="text"
                     />
                 </Form.Group>
-                <Form.Group controlId="formBasicDatetime">
-                    <div className="text-left d-flex justify-content-between">
+                <Form.Group controlId="formBasicDatetime" className="p-0 m-0">
+                    <div className="text-left d-flex justify-content-between ">
                         <DatePicker
                             disabled={!isEditMode}
                             selected={date}
@@ -210,7 +210,7 @@ export default function MeetingModal({ meeting, ...props }) {
                             dateFormat="MMMM d, h:mm aa"
                             ref={datetimeRef}
                         />
-                        <span> תאריך/שעה</span>
+                        <div> תאריך/שעה</div>
                     </div>
                 </Form.Group>
                 <Form.Group controlId="formBasicLocation">
@@ -245,13 +245,13 @@ export default function MeetingModal({ meeting, ...props }) {
                         ref={descriptionRef}
                         type="text"
                     />
-                    <h5>:רשומים</h5>
-                    <PrticipatesList
-                        participates={meeting?.participates}
-                        editable={isEditMode}
-                        onDelete={RemovePar}
-                    />
                 </Form.Group>
+                <h5>:משתתפים</h5>
+                <PrticipatesList
+                    participates={meeting?.participates}
+                    editable={isEditMode}
+                    onDelete={RemovePar}
+                />
             </Modal.Body>
             <Modal.Footer>{GetModalAction()}</Modal.Footer>
         </Modal>
@@ -261,7 +261,6 @@ export default function MeetingModal({ meeting, ...props }) {
 function PrticipatesList({ participates, editable, onDelete }) {
     return (
         <>
-            <Button>הוסף משתתף</Button>
             <ListGroup className="p-0 m-0">
                 {participates?.map((par) => (
                     <ListGroup.Item

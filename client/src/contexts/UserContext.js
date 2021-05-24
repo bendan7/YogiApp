@@ -74,12 +74,12 @@ export function UserProvider({ children }) {
         )
     }
 
-    // On component mount
+    // On component mount with user
     useEffect(() => {
         if (currentUser) {
             GetUserInfo()
         }
-    }, [])
+    }, [currentUser])
 
     // On meetings change
     useEffect(() => {

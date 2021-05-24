@@ -17,19 +17,15 @@ export default function UpdateProfile() {
     const [msg, setMsg] = useState()
 
     function updateDisplayName() {
-        setError('')
-        setLoading(true)
         updateUserDisplayName(displayNameRef.current.value).then(() => {
             setLoading(false)
+            oldPassRef.current.value = ''
             setMsg('הפרטים עודכנו בהצלחה')
         })
     }
 
     async function updatePassword() {
         try {
-            setError('')
-            setLoading(true)
-
             await login(emailRef.current.value, oldPassRef.current.value)
             await updateUserPassword(passwordRef.current.value)
 
@@ -50,6 +46,9 @@ export default function UpdateProfile() {
         if (passwordRef.current.value !== passwordConfRef.current.value) {
             return setError('הסיסמאות אינן תואומות')
         }
+
+        setError('')
+        setLoading(true)
 
         if (passwordRef.current.value === '') {
             updateDisplayName()

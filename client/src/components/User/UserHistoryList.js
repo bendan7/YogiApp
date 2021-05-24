@@ -1,8 +1,13 @@
 import React from 'react'
-import { ListGroup } from 'react-bootstrap'
+import { Button, ListGroup, Badge } from 'react-bootstrap'
 import { useUserContext } from '../../contexts/UserContext'
 
-export default function UserHistoryList({ historyList, maxInfoEntries }) {
+export default function UserHistoryList({
+    historyList,
+    maxInfoEntries,
+    deletable,
+    onDeleteEntry,
+}) {
     function HistoryEntry(props) {
         const date = new Date(props.date?._seconds * 1000)
         const type = props.type === 'meeting' ? 'שיעור' : 'כרטיסיה'
@@ -17,13 +22,22 @@ export default function UserHistoryList({ historyList, maxInfoEntries }) {
         const dateStr = `${date?.getDate()}/${date?.getMonth() + 1}`
 
         let variant = props.type === 'meeting' ? 'info' : 'success'
-
+        console.log()
         return (
             <ListGroup.Item variant={variant} className="p-1">
                 <div className="d-flex flex-row-reverse ">
                     <div className="d-flex justify-content-between">
                         <div>{type}-</div>
                         <div>{dateStr}</div>
+                        {deletable ? (
+                            <Badge
+                                className="ml-3"
+                                variant="danger"
+                                onClick={() => onDeleteEntry(props)}
+                            >
+                                x
+                            </Badge>
+                        ) : null}
                     </div>
                     <div className="w-75">{text}</div>
                 </div>
