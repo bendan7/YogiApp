@@ -14,6 +14,8 @@ export function UserProvider({ children }) {
     //upcoming meetings list
     const { meetings } = useMeetingsContext()
 
+    const [isLoading, SetIsLoading] = useState(true)
+
     // registered upcoming meetings ids list
     const [registered, setRegistered] = useState([])
 
@@ -46,6 +48,7 @@ export function UserProvider({ children }) {
                     .then((data) => {
                         setUserHistory(data.history)
                         setUserEntries(data.remainsEntries)
+                        SetIsLoading(false)
                     })
                     .catch((err) => {
                         console.log(err)
@@ -57,21 +60,23 @@ export function UserProvider({ children }) {
     }
 
     async function RegisterMeeting(meeting) {
+        SetIsLoading(true)
         const httpReq = await GetHttpReq()
         httpReq.method = 'PUT'
         return fetch(
             `${process.env.REACT_APP_BASE_URL}/api/meetings/register/${meeting.id}`,
             httpReq
-        )
+        ).finally(() => SetIsLoading(false))
     }
 
     async function UnregisterFromMeeting(meeting) {
+        SetIsLoading(true)
         const httpReq = await GetHttpReq()
         httpReq.method = 'PUT'
         return fetch(
             `${process.env.REACT_APP_BASE_URL}/api/meetings/deregister/${meeting.id}`,
             httpReq
-        )
+        ).finally(() => SetIsLoading(false))
     }
 
     // On component mount with user
@@ -92,6 +97,7 @@ export function UserProvider({ children }) {
         registered,
         userHistory,
         userEntries,
+        isLoading,
         RegisterToMeeting: RegisterMeeting,
         UnregisterFromMeeting,
     }
