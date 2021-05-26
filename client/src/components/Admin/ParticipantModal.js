@@ -45,12 +45,24 @@ export default function ParticipantModal({ show, handleClose, participant }) {
     async function deleteHistoryEntry(entry) {
         setIsLoading(true)
         const dbName = entry.type === 'meeting' ? 'meetings' : 'tickts'
-        db.collection(dbName)
-            .doc(entry.docId)
-            .delete()
-            .then(() => {
-                GetUserInfo(participant.uid)
-            })
+
+        if (entry.type === 'tickts') {
+            db.collection(dbName)
+                .doc(entry.docId)
+                .delete()
+                .then(() => {
+                    GetUserInfo(participant.uid)
+                })
+        } else if (entry.type === 'meeting') {
+            db.collection(dbName)
+                .doc(entry.docId)
+                .update({
+                    participants: firebase.firestore.FieldValue.arrayRemove(
+                        `${participant.uid}`
+                    ),
+                })
+                .finally(() => GetUserInfo(participant.uid))
+        }
     }
 
     useEffect(() => {
