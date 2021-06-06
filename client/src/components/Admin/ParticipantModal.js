@@ -46,7 +46,7 @@ export default function ParticipantModal({ show, handleClose, participant }) {
         setIsLoading(true)
         const dbName = entry.type === 'meeting' ? 'meetings' : 'tickts'
 
-        if (entry.type === 'tickts') {
+        if (entry.type === 'tickt') {
             db.collection(dbName)
                 .doc(entry.docId)
                 .delete()
@@ -71,7 +71,7 @@ export default function ParticipantModal({ show, handleClose, participant }) {
             setIsLoading(true)
             GetUserInfo(participant.uid)
         }
-    }, [participant])
+    }, [participant, show])
 
     return (
         <Modal
